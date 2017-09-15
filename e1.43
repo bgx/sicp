@@ -1,0 +1,11 @@
+2017.07.12 Wednesday
+e1.43
+
+>>
+
+(define (repeated f n)
+  (define (repeated-iter g k)
+    (if (> k 1)
+        (repeated-iter (compose f g) (- k 1))
+        g))
+  (repeated-iter f n))

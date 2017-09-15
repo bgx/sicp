@@ -1,0 +1,58 @@
+2016.11.27 Sunday
+e1.09
+
+(inc x) increments its argument by 1; (dec x) decrements its argument by 1;
+
+a.
+
+(define (+ a b)
+  (if (= a 0)
+      b
+      (inc (+ (dec a) b))))
+
+>> Take (+ 4 5):
+(+ 4 5)
+(if (= 4 0) 5 (inc (+ (dec 4) 5)))
+(inc (+ (dec 4) 5))
+(inc (+ 3 5))
+(inc (if (= 3 0) 5 (inc (+ (dec 3) 5))))
+...
+(inc (inc (inc (inc 5)))
+(inc (inc (inc 6)))
+(inc (inc 7))
+(inc 8)
+9
+
+This process is recursive.
+- Expansion followed by contraction
+- Expansion: Builds up a chain of deferred operations
+- Contraction: The operations are actually performed
+*Key: a chain of deferred operations
+*The interpreter must keep track of the operations to be performed later on
+
+b.
+
+(define (+ a b)
+  (if (= a 0)
+      b
+      (+ (dec a) (inc b))))
+
+>> Take (+ 4 5):
+(+ 4 5)
+(if (= 4 0) 5 (+ (dec 4) (inc 5)))
+(+ (dec 4) (inc 5))
+(+ 3 6)
+...
+(+ 2 7)
+...
+(+ 0 9)
+(if (= 0 0) 9 (+ (dec 0) (inc 9)))
+9
+
+This process is iterative.
+- Does not grow and shrink
+- At each step, all we need to keep track of are the current values of a and b
+*Key: state of process can be summarized by:
+(a) a fixed number of state variables
+(b) a fixed rule that describes how the state variables should be updated as the process moves from state to state
+(c) (optional) an end test that specifies conditions under which the process should terminate

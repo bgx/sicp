@@ -1,0 +1,135 @@
+2017.02.10 Friday
+e1.24
+
+>> [CODE]
+
+#lang sicp
+(#%require (only racket/base random))
+
+(define (square n)
+  (* n n))
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+;        (else (find-divisor n (next test-divisor)))))
+        (else (find-divisor n (+ 1 test-divisor)))))
+
+(define (next x)
+  (if (= x 2)
+      3
+      (+ x 2)))
+
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (even? n)
+  (= 0 (remainder n 2)))
+
+(define (fast-expt-iter b n a)
+  (cond ((= n 0) a)
+        ((even? n) (fast-expt-iter (* b b) (/ n 2) a))
+        (else (fast-expt-iter b (- n 1) (* a b)))))
+
+(define (fast-expt b n)
+  (fast-expt-iter b n 1))
+
+;---------------------------------
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+;---------------------------------
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (square (expmod base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m))
+                    m))))
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  ;(try-it (+ 1 (random (- n 1)))))
+  (try-it (+ 1 (big-random (- n 1)))))
+
+(define (big-random x)
+  (let ((random-max 4294967087))
+    (+ (* (quotient x random-max)
+          (random random-max))
+       (random (+ 1
+                  (remainder x random-max))))))
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else false)))
+
+;---------------------------------
+
+(define (report-prime n elapsed-time)
+  (newline)
+  (display n)
+  (display " *** ")
+  (display elapsed-time))
+
+(define (start-prime-test n start-time)
+;  (if (prime? n)
+  (if (fast-prime? n 8)
+      (begin
+        (report-prime n (- (runtime) start-time))
+        1)
+      0))
+
+(define (timed-prime-test n)
+  (start-prime-test n (runtime)))
+
+(define (search-for-primes-iter current found tofind)
+  (if (>= found tofind)
+      (begin
+        (newline)
+        (display "end"))
+      (search-for-primes-iter (+ 2 current) (+ found (timed-prime-test current)) tofind)))
+
+(define (search-for-primes lower-bound count)
+  (if (even? lower-bound)
+      (search-for-primes-iter (+ 1 lower-bound) 0 count)
+      (search-for-primes-iter lower-bound 0 count)))
+
+>> [USE]
+
+> (search-for-primes (fast-expt 10 10) 3)
+
+10000000019 *** 424
+10000000033 *** 401
+10000000061 *** 435
+end
+> (search-for-primes (fast-expt 10 10) 3)
+
+10000000019 *** 1337
+10000000033 *** 375
+10000000061 *** 551
+end
+> (search-for-primes (fast-expt 10 20) 3)
+
+100000000000000000039 *** 25032
+100000000000000000129 *** 1130
+100000000000000000151 *** 1143
+end
+> (search-for-primes (fast-expt 10 20) 3)
+
+100000000000000000039 *** 1177
+100000000000000000129 *** 1067
+100000000000000000151 *** 1104
+end
+
+>> [Discussion]
+
+With the O(log n) time complexity, I would expect the time to test primes near 10^20 to be twice as long as the time to test primes near 10^10.
+
+Small sample size, but it looks like this is generally the case if you throw out the two outliers that are easy to identify.

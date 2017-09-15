@@ -1,0 +1,86 @@
+2017.01.27 Friday
+e1.22
+
+>>
+
+#lang sicp
+
+(define (square n)
+  (* n n))
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (even? n)
+  (= 0 (remainder n 2)))
+
+(define (fast-expt-iter b n a)
+  (cond ((= n 0) a)
+        ((even? n) (fast-expt-iter (* b b) (/ n 2) a))
+        (else (fast-expt-iter b (- n 1) (* a b)))))
+
+(define (fast-expt b n)
+  (fast-expt-iter b n 1))
+
+;---------------------------------
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+;---------------------------------
+
+(define (report-prime n elapsed-time)
+  (newline)
+  (display n)
+  (display " *** ")
+  (display elapsed-time))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (begin
+        (report-prime n (- (runtime) start-time))
+        1)
+      0))
+
+(define (timed-prime-test n)
+  (start-prime-test n (runtime)))
+
+(define (search-for-primes-iter current found tofind)
+  (if (>= found tofind)
+      (begin
+        (newline)
+        (display "end"))
+      (search-for-primes-iter (+ 2 current) (+ found (timed-prime-test current)) tofind)))
+
+(define (search-for-primes lower-bound count)
+  (if (even? lower-bound)
+      (search-for-primes-iter (+ 1 lower-bound) 0 count)
+      (search-for-primes-iter lower-bound 0 count)))
+
+>>
+
+(search-for-primes (fast-expt 10 15) 3)
+
+1000000000000037 *** 23779419
+1000000000000091 *** 23875587
+1000000000000159 *** 23359404
+end
+> (search-for-primes (fast-expt 10 13) 3)
+
+10000000000037 *** 2275966
+10000000000051 *** 2288439
+10000000000099 *** 2268393
+end
+> (search-for-primes (fast-expt 10 11) 3)
+
+100000000003 *** 228210
+100000000019 *** 215140
+100000000057 *** 214138
+end

@@ -1,0 +1,21 @@
+2016.11.06
+e1.03
+Define a procedure that takes three numbers as arguments and returns the sum of the squares of the two larger numbers.
+
+>>
+(define (square x)
+    (* x x))
+
+(define (sum-of-squares x y)
+    (+ (square x) (square y)))
+
+(define (sos-max2 a b c)
+    (if (> a b)
+        (if (> b c)
+            (sum-of-squares a b)
+            (sum-of-squares a c))
+        (if (> a c)
+            (sum-of-squares b a)
+            (sum-of-squares b c))))
+
+>> Could easily write tests for this.  I just tested with various values of input.  Looks right.

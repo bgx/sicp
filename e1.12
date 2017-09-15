@@ -1,0 +1,17 @@
+2016.12.01 Thursday
+e1.12
+
+>>
+
+(define (pascal-iter row column)
+  (cond ((or (< column 1) (> column row)) -1)
+        ((or (= column 1) (= column row)) 1)
+        (else (+ (pascal-iter (- row 1) (- column 1))
+                 (pascal-iter (- row 1) column)))))
+
+(define (pascal row column)
+  (pascal-iter row column))
+
+>>>
+
+Could be changed to be less expensive with resources (there are redundant computations)

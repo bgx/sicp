@@ -1,0 +1,33 @@
+2017.07.12 Wednesday
+e1.44
+
+>>
+
+(define (smooth f)
+  (define dx 1)
+  (lambda (x) (/ (+ (f (- x dx))
+                    (f x)
+                    (f (+ x dx)))
+                 3)))
+
+(define (n-fold-smooth f n)
+  ((repeated smooth n) f))
+
+>>
+
+(#%require plot)
+(#%require (rename racket racket-list list))
+(plot (racket-list (function sin -6.28 6.28)
+                   (function (smooth sin) -6.28 6.28 #:color 1)
+                   (function (n-fold-smooth sin 3) -6.28 6.28 #:color 2)
+                   (function (n-fold-smooth sin 6) -6.28 6.28 #:color 3 #:style 'dot)))
+
+The use of list from racket was needed because using list from #lang sicp was not working with the plot function
+
+>>>
+
+; Correct:   ( (smooth (smooth f)) x )
+; Correct:   ( ((lambda (y) (smooth (smooth y))) f) x )
+; Incorrect: ( ((smooth smooth) f) x )
+
+

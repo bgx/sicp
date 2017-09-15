@@ -1,0 +1,55 @@
+2016.11.14 Monday
+e1.07
+
+...finding the square roots of very small numbers
+
+>> The good-enough? test checks against a .001 difference between the squared guess and the actual square, no matter what value the actual square is.  When the actual square is .01, this allows for a 1% error.  When the actual square is .001, this allows for a 100% error.  And it gets worse as the actual square is smaller.
+
+example: (good-enough? 0.03 0.0001) evaluates to #t
+(good-enough? .002 .0001) evaluates to #t
+
+compare to .01, the actual answer
+
+...this makes our test inadequate for very large numbers
+
+>> The good-enough? test evaluates a difference and returns true if it is less than .001.  The subtraction operation can only use so many significant digits for each operand.  When the operands get large enough, some of the least significant digits will be chopped off the result.  So a squared guess could be evaluated to a number with a difference much greater than .001, but that difference will be chopped off and hidden.
+
+example: (good-enough? 100000000.00000001 10000000000000000)
+This evaluates to false, which is good.  This is (10^8+10^-8) compared to (10^16).  The square of the guess evaluates to (10^16+2+10^-16).  2 is obviously more than .001, and this difference is caught.  17 significant digits are needed to account for the 2.
+
+(good-enough? 1000000000.00000001 1000000000000000000)
+This is (10^9+10^-8) compared to (10^18).  The square of the guess evaluates to (10^18+20+10^-8).  The interpreter I'm using actually returns true for this, even though 20 is way outside the acceptable .001 difference.  18 significant digits would be needed to account for the 2 in 20.  So the interpreter must only be able to keep track of 17 digits in subtraction operations.
+
+This demonstrates the failure of the good-enough? test for very large numbers.
+
+...Implement new good-enough? into sqrt-iter
+
+before: (sqrt-iter 1 .0001) -> 0.032308...
+
+*I'm not seeing bad results with large numbers -- idk
+
+>>
+
+#lang sicp
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (square x)
+  (* x x))
+
+(define (good-enough? pguess guess x)
+  (< (abs (- pguess guess)) (* 0.01 x)))
+
+(define (sqrt-iter pguess guess x)
+  (if (good-enough? pguess guess x)
+      guess
+      (sqrt-iter guess (improve guess x) x)))
+
+(define (sqrt x)
+  (sqrt-iter 0.0 1.0 x))
+
+This is definitely better for small numbers.  I'm not so sure about for large numbers.  Whether or not large numbers play well with this is dependent on the ratio used inside good-enough?.  The denominator of the ratio must be very large inorder for the test to give good results for very large numbers.

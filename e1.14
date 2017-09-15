@@ -1,0 +1,6 @@
+2017.01.10 Tuesday
+e1.14
+
+>> The worst case on space is always going to be the long chain of 1 decrements -> I think that is O(n+5), in other words, O(n).
+
+The orders of growth of the number of steps is more complicated.  I had to look up an explanation.  Something to come back to.

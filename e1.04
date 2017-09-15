@@ -1,0 +1,11 @@
+2016.11.06 Sunday
+e1.04
+
+(define (a-plus-abs-b a b)
+    ((if (> b 0) + -) a b))
+
+>>if b is greater than 0, the operator will evaluate to +, so (a-plus-abs-b a b) will evaluate to (+ a b)
+
+if b is less than or equal to 0, the operator will evaluate to -, so (a-plus-abs-b a b) will evaluate to (- a b)
+
+this is equivalent to a + |b|

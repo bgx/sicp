@@ -1,0 +1,57 @@
+2017.04.11 Tuesday
+e1.31
+
+> Write a procedure called product that returns the product of the values of a function at points over a given range.
+
+If your product procedure generates a recursive process, write one that generates an iterative process, and vice versa.
+
+Show how to define factorial in terms of product.
+
+Show how to compute an approximation to pi using a finite approximation to the Wallis product
+
+>> 
+
+(define (product-iterative term a next b)
+  (define (product-iter a result)
+    (if (> a b)
+        result
+        (product-iter (next a) (* result (term a)))))
+  (product-iter a 1))
+
+(define (product-recursive term a next b)
+  (if (> a b)
+      1
+      (* (term a)
+         (product-recursive term (next a) next b))))
+
+(define product product-iterative)
+
+(define (factorial n)
+  (product * 1 inc n))
+
+(define (pi-approx n)
+  (define (term x)
+      (/ (* 4.0 (square x))
+         (- (* 4.0 (square x)) 1)))
+   (* 2 (product term 1 inc n)))
+
+>>>
+
+pi-approx takes two multiplies, one subtraction, and one division to generate a term, assuming that (* 4.0 (square x)) is only calculated once per term
+
+of note is that using 4.0, instead of 4, speeds up pi-approx an incredible amount.  4.0 is an inexact number, while 4 is an exact number.  performing a multiplication or division with an exact number and an inexact number results in an inexact number.  from the Racket Guide 3.2 Numbers (https://docs.racket-lang.org/guide/numbers.html):
+
+"In terms of performance, computations with small integers are typically the fastest, where “small” means that the number fits into one bit less than the machine’s word-sized representation for signed numbers. Computation with very large exact integers or with non-integer exact numbers can be much more expensive than computation with inexact numbers."
+
+>>>
+
+In learning about the use of 'let' from section 1.3.2, I came back to this function and updated it to:
+
+(define (pi-approx n)
+  (define (term x)
+    (let ((z (* 4.0 (square x))))
+      (/ z
+         (- z 1))))
+   (* 2 (product term 1 inc n)))
+
+When profiling the time that each method takes with large n, this new method is significantly faster.  This leads me to believe that (* 4.0 (square x)) was actually calculated twice in the first implementation, while it is only calculated once in this new implementation.

@@ -1,0 +1,37 @@
+2016.11.29 Tuesday
+e1.10
+
+>>
+
+A(1,10)
+A(0,A(1,9))
+2*A(1,9)
+2*2*A(1,8)
+2^9*A(1,1)
+2^9*2
+2^10
+
+A(2,4)
+A(1,A(2,3))
+A(1,A(1,A(2,2)))
+A(1,A(1,A(1,A(2,1))))
+A(1,A(1,A(1,2)))
+A(1,A(1,4))
+A(1,16)
+2^16
+
+A(3,3)
+A(2,A(3,2))
+A(2,A(2,A(3,1)))
+A(2,A(2,2))
+A(2,4)
+2^16
+
+(f n) computes 2n
+(g n) computes 2^n
+(h n) computes 2^2^2...(starting with 2, apply a square n-1 times)
+
+another way to say what (h n), or h(n), computes:
+0 if n=0
+2 if n=1
+2^h(n-1) if n>1

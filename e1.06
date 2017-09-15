@@ -1,0 +1,12 @@
+2016.11.13 Sunday
+e1.06
+
+What happens when Alyssa attempts to use this to compute square roots? Explain
+
+>Important, from p.21: "[...] the evaluation rule for the special form if is the same whether the interpreter is using normal or applicative order: The predicate expression is evaluated first, and the result determines whether to evaluate the consequent or the alternative expression."
+
+>> The program will never complete running. 
+
+When the special form if is used, the recursive call to sqrt-iter will only be evaluated if the predicate expression determines it should be evaluated.  Eventually, the predicate will determine that the consequent 'guess' should be evaluated, and the alternative expression, the recursive call to sqrt-iter, will not be evaluated.
+
+The compound procedure 'new-if' does not operate in this manner.  Note that the interpreter we are using is using applicative form, not normal form.  So the predicate expression, the consequent expression, and the alternative expression will all be evaluated before inserting them into the 'new-if' procedure.  A call to sqrt-iter will result in an evaluation of sqrt-iter, which will result in an evaluation of sqrt-iter, and so on and so on.  A result will never be returned. 

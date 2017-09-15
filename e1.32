@@ -1,0 +1,30 @@
+2017.07.08 Saturday
+e1.32
+
+>>
+
+;accumulate - combines a collection of terms
+;combiner: procedure of two arguments, that specifies how the current term
+;          is to be combined with the accumulation of the preceding terms
+;null-value: specifies what base value to use when the terms run out
+
+(define (accumulate-iterative combiner null-value term a next b)
+  (define (accumulate-iter a result)
+    (if (> a b)
+        result
+        (accumulate-iter (next a) (combiner result (term a)))))
+  (accumulate-iter a null-value))
+
+(define (accumulate-recursive combiner null-value term a next b)
+  (if (> a b)
+      null-value
+      (combiner (term a)
+                (accumulate-recursive combiner null-value term (next a) next b))))
+
+(define accumulate accumulate-iterative)
+
+(define (sum-via-accumulate term a next b)
+  (accumulate + 0 term a next b))
+
+(define (product-via-accumulate term a next b)
+  (accumulate * 1 term a next b))

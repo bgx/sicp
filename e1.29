@@ -1,0 +1,41 @@
+2017.04.03 Monday
+e1.29
+
+>>
+
+#lang sicp
+
+(define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+
+(define (simpson f a b n)
+  (define (is-even x)
+    (= (remainder x 2) 0))
+  (define (inc n) (+ n 1))
+  (define h (/ (- b a) n))
+  (define (simpson-coefficient x)
+    (cond ((= x 0) 1)
+          ((= x n) 1)
+          ((is-even x) 2)
+          (else 4)))
+  (define (simpson-term x)
+    (* (simpson-coefficient x)
+       (f (+ a (* h x)))))
+  (* (/ h 3)
+     (sum simpson-term 0 inc n)))
+
+(define (cube x) (* x x x))
+
+>>
+
+> (simpson cube 0.0 1.0 100)
+0.24999999999999992
+> (simpson cube 0.0 1.0 1000)
+0.2500000000000003
+
+>>>
+
+Yup.  Really helped to write this one out on a sheet of paper first.

@@ -1,0 +1,23 @@
+2017.07.09 Sunday
+e1.33
+
+>>
+
+(define (filtered-accumulate-iterative combiner null-value term a next b filter)
+  (define (filtered-combine a result)
+    (if (filter a)
+        (combiner result (term a))
+        result))
+  (define (accumulate-iter a result)
+    (if (> a b)
+        result
+        (accumulate-iter (next a) (filtered-combine a result))))
+  (accumulate-iter a null-value))
+
+(define filtered-accumulate filtered-accumulate-iterative)
+
+(define (sum-of-squares-of-primes a b)
+  (filtered-accumulate + 0 square a inc b prime?))
+
+(define (product-of-relatively-prime n)
+  (filtered-accumulate * 1 identity 1 inc (- n 1) (lambda (i) (= 1 (gcd i n)))))

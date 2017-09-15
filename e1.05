@@ -1,0 +1,60 @@
+2016.11.06 Sunday
+e1.05
+
+(define (p) (p))
+
+(define (test x y)
+    (if (= x 0)
+        0
+        y))
+
+(test 0 (p))
+
+> p is a procedure.  (p) is an application of the procedure p, i.e. a procedure call.
+
+!What behavior will be observed with an interpreter that uses applicative-order evaluation?
+
+>>The interpreter will try to evaluate the arguments to #<procedure:test> before applying these values to the body of test.  So the interpreter will try to evaluate (p). This will evaluate to itself over and over again -- the interpreter will run and not give a result.
+
+!What behavior will be observed with an interpreter that uses normal order evaluation?
+
+>>(test 0 (p)) will be expanded to
+
+(if (= 0 0)
+    0
+    (p))
+
+Since the question write-up says to make an assumption that for the special form if, "the predicate expression is evaluated first, and the result determines whether to evaluate the consequent or the alternative expression," the expression will be evaluated to
+
+(if #t 0 (p))
+
+Since the predicate is #t, we evaluate the consequent expression, 0, to get
+
+0
+
+>>> 
+
+(define p p)
+->p: undefined; cannot reference an identifier before its definition
+
+(define p (p))
+-> same as above
+
+(define (p) p)
+(p)
+->#<procedure:p>
+p
+->#<procedure:p>
+
+(define (p) (p))
+p
+->#<procedure:p>
+(p)
+-> never finishes evaluating -- constantly replacing with self
+
+(define (p) ((p)))
+p
+->#<procedure:p>
+(p)
+-> keeps expanding (p) -> ((p)) -> (((p))) -> etc. until there is no more memory
+ 
