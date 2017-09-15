@@ -1,0 +1,32 @@
+2017.07.19 Wednesday
+e2.18
+
+>>
+
+(define (reverse-iterative items)
+  (define (reverse-iter itemsleft output)
+    (if (null? itemsleft)
+        output
+        (reverse-iter (cdr itemsleft) (cons (car itemsleft) output))))
+  (reverse-iter items '()))
+
+(define (reverse-recursive items)
+  (if (null? (cdr items))
+      items
+      (append (reverse-recursive (cdr items)) (list (car items)))))
+
+(define reverse reverse-iterative)
+
+>>>
+
+Interesting note:
+
+In reverse-recursive, if 
+
+	(if (null? (cdr items))
+
+is replaced with
+
+	(if (null? items)
+
+the same result is achieved.  The second variation makes one more call to reverse-recursive.

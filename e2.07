@@ -1,0 +1,7 @@
+2017.07.18 Tuesday
+e2.7
+
+>>
+
+(define (lower-bound interval) (car interval))
+(define (upper-bound interval) (cdr interval))

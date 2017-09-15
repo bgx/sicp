@@ -1,0 +1,20 @@
+2017.07.14 Friday
+e2.4
+
+>>
+
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z)
+  (z (lambda (p q) p)))
+
+(define (cdr z)
+  (z (lambda (p q) q)))
+
+; Verify that ... yields x for any objects x and y (using substitution model of 1.1.5)
+(car (cons 10 24))
+(car (lambda (m) (m 10 24)))
+((lambda (m) (m 10 24)) (lambda (p q) p))
+((lambda (p q) p) 10 24)
+10

@@ -1,0 +1,24 @@
+2017.07.14 Friday
+e2.5
+
+>>
+
+(define (cons a b)
+  (* (expt 2 a)
+     (expt 3 b)))
+
+(define (car n)
+  (define (car-iter n result)
+    (let ((x (/ n 2)))
+      (if (integer? x)
+          (car-iter x (inc result))
+          result)))
+  (car-iter n 0))
+
+(define (cdr n)
+  (define (cdr-iter n result)
+    (let ((x (/ n 3)))
+      (if (integer? x)
+          (cdr-iter x (inc result))
+          result)))
+  (cdr-iter n 0))

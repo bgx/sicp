@@ -1,0 +1,18 @@
+2017.08.01 Tuesday
+e2.27
+
+>>
+
+(define (deep-reverse items)
+  (cond ((not (list? items)) (display "Invalid input: items must be a list")(newline))
+        ((null? items) items)
+        ((pair? (car items))
+            (append (deep-reverse (cdr items))
+                    (list (deep-reverse (car items)))))
+        (else
+            (append (deep-reverse (cdr items))
+                    (list (car items))))))
+
+>>>
+
+Compare with 2.2.1 reverse-recursive

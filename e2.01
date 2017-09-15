@@ -1,0 +1,10 @@
+2017.07.13 Thursday
+e2.1
+
+>>
+
+(define (make-rat n d)
+  (let ((g (gcd (abs n) (abs d))))
+    (if (negative? d)
+        (cons (- (/ n g)) (- (/ d g)))
+        (cons (/ n g) (/ d g)))))

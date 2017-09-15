@@ -1,0 +1,10 @@
+2017.09.09 Saturday
+e2.39
+
+>>
+
+(define (reverse-via-fold-right sequence)
+  (fold-right (lambda (x y) (append y (list x))) '() sequence))
+
+(define (reverse-via-fold-left sequence)
+  (fold-left (lambda (x y) (cons y x)) '() sequence))

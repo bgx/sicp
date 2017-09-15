@@ -1,0 +1,77 @@
+2017.09.12 Monday
+e2.43
+
+>
+
+Instead of:
+
+(define (queen-cols k) 
+  (if (= k 0)
+    (list empty-board)
+    (filter
+      (lambda (positions) (safe? k positions))
+      (flatmap
+        (lambda (rest-of-queens)
+          (map (lambda (new-row)
+                 (adjoin-position new-row k rest-of-queens))
+               (enumerate-interval 1 board-size)))
+        (queen-cols (- k 1))))))
+        
+Louis Reasoner has (note last two lines):
+
+(define (queen-cols k) 
+  (if (= k 0)
+    (list empty-board)
+    (filter
+      (lambda (positions) (safe? k positions))
+      (flatmap
+        (lambda (new-row)
+          (map (lambda (rest-of-queens)
+                 (adjoin-position new-row k rest-of-queens))
+               (queen-cols (- k 1))))
+        (enumerate-interval 1 board-size)))))
+        
+>
+
+The flatmap takes as input a set of safe sets of queens for columns 1 to k-1, and generates a set of all possibly safe sets of queens for columns 1 to k.  To do this, for each safe set of queens for columns 1 to k-1, generate a set of queens that is that safe set with each possible row position in column k, and then make a set of all these generated sets.
+
+empty-board
+for each row i in board, adjoin position (i 1) to empty-board to make set of length 1
+make set of all sets of length 1
+filter any unsafe sets of length 1 out of set
+
+filtered set of all sets of length 1
+for each set s in filtered set of all sets of length 1,
+    for each row i in board, adjoin position (i 2) to set s to make set of length 2
+make set of all sets of length 2
+filter any unsafe sets of length 2 out of set
+
+filtered set of all sets of length 2
+for each set s in filtered set of all sets of length 2,
+    for each row i in board, adjoin position (i 3) to set s to make set of length 3
+make set of all sets of length 3
+filter any unsafe sets of length 3 out of set
+
+adjoin-position is done board-size times for each set in set of safe sets
+
+______________________________________
+
+>>
+
+The original (queen-cols k) evaluates (queens-cols (- k 1)) once, and applies a flatmap to this sequence.  So for (queen-cols 8), the function queen-cols is evaluated 9 times total, the last time being (queen-cols 0).
+
+The modified (queen-cols k) evaluates (queens-cols (- k 1)) inside the procedure of the flatmap that is applied to a sequence of board-size values; thus, (queen-cols k) evaluates (queen-cols (- k 1)) board-size times.  This happens with each call to queen-cols.  (queen-cols 8) evaluates (queen-cols 7) 8 times, and each of these evaluates (queen-cols 6) 8 times, and so on until each (queen-cols 1) evaluates (queen-cols 0) 8 times - so we have 1*8*8*8*8*8*8*8*8=8^8 occurences of (queen-cols 8) down to (queen-cols 0) being evaluated.
+
+Since the original version is like one of these occurences, and it takes time T, the entire modified version can be said to take time 8^8*T, or board-size^board-size*T.
+
+>>>
+
+There's more to this and I think at least my third paragraph above is incorrect.
+
+First, we need to decide what is the cost of everything in queen-cols that is not a recursive call to queen-cols.  What is the cost of the flatmap (map of adjoin position, accumulate with append) and the filter?  Can we figure out how the costs are dependent on the input value k and the board-size?
+
+Second, we need to realize that board-size^board-size is only the number of evaluations of (queen-cols 0).  If queen-cols has a cost in addition to its recursive calls to queen-cols (which it definitely does, see above), then we need to count each evaluation of queen-cols as a contribution to cost.  We can do this by setting up a perfect k-ary tree, where k is board-size and height is board-size.  Then the number of total queen-cols evaluations is the number of nodes in the k-ary tree.
+
+At this point we can know how many evaluations of queen-cols happen for each input value.  If we can assign a cost to queen-cols for each input value, then we could multiply the cost of each level with the number of evaluations at each level, and sum these, to get the total cost of the modified version.
+
+The original version cost would be the sum of the costs of each level (since there is only one evaluation at each level).

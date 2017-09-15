@@ -1,0 +1,19 @@
+2017.09.10 Sunday
+e2.41
+
+>>
+
+(define (unique-triples n)
+  (flatmap
+    (lambda (i)
+      (map (lambda (j) (append (list i) j))
+           (unique-pairs (- i 1))))
+    (enumerate-interval 1 n)))
+
+(define (make-triple-sum triple)
+  (list (car triple) (cadr triple) (caddr triple) (+ (car triple) (cadr triple) (caddr triple))))
+
+(define (ordered-triples n s)
+  (map make-triple-sum
+    (filter (lambda (x) (= (accumulate + 0 x) s))
+            (unique-triples n))))

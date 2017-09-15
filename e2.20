@@ -1,0 +1,17 @@
+2017.07.20 Thursday
+e2.20
+
+>>
+
+(define (same-parity x . y)
+  (define (get-filter func)
+    (lambda (x) (if (func x)
+                    (list x)
+                    '())))
+  (define (same-parity-iter filter items result)    
+    (if (null? items)
+        result
+        (same-parity-iter filter (cdr items) (append result (filter (car items))))))         
+  (if (even? x)
+      (same-parity-iter (get-filter even?) y (list x))
+      (same-parity-iter (get-filter odd?) y (list x))))

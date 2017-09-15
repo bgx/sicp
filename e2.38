@@ -1,0 +1,78 @@
+2017.09.07 Thursday
+e2.38
+
+>>
+
+> (define test-list (list 1 2 3))
+> (fold-right / 1 test-list)
+1 1/2
+> (fold-left / 1 test-list)
+1/6
+> (fold-right list nil test-list)
+{1 {2 {3 ()}}}
+> (fold-left list nil test-list)
+{{{() 1} 2} 3}
+
+op must be commutative to guarantee that fold-right and fold-left will produce the same values for any sequence
+
+>>>
+
+Say
+operation: op
+initial entry: I
+sequence: A B C D E
+_____
+
+fold-right evaluates to
+(op A (op B (op C (op D (op E I)))))
+
+I visualize this as the following process:
+A B C D E I
+  A B C D w where w=(op E I)
+    A B C x where x=(op D w)
+      A B y where y=(op C x)
+        A z where z=(op B y)
+          R where R=(op A z)=result
+_____
+fold-left evaluates to
+(op (op (op (op (op I A) B) C) D) E)
+
+I visualize this as the following process:
+I A B C D E
+w B C D E   where w=(op I A)
+x C D E     where x=(op w B)
+y D E       where y=(op x C)
+z E         where z=(op y D)
+R           where R=(op z E)=result
+_____
+some languages, including Racket, change the order of operands so fold-left evaluates to
+(op E (op D (op C (op B (op A I)))))
+
+I visualize this as the following process:
+I   A B C D E
+A I   B C D E
+w   B C D E   where w=(op A I)
+B w   C D E
+x   C D E     where x=(op B w)
+C x   D E
+y   D E       where y=(op C x)
+D y   E
+z   E         where z=(op D y)
+E z
+R             where R=(op E z)=result
+_____
+although I haven't seen a use for this yet, the order of operands could also be changed so that fold-right evaluates to
+(op (op (op (op (op I E) D) C) B) A)
+
+I visualize this as the following process:
+A B C D E   I
+A B C D   I E
+  A B C D   w where w=(op I E)
+  A B C   w D
+    A B C   x where x=(op w D)
+    A B   x C
+      A B   y where y=(op x C)
+      A   y B
+        A   z where z=(op y B)
+          z A
+            R where R=(op z A)=result

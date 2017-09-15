@@ -1,0 +1,90 @@
+2017.07.18 Tuesday
+e2.11
+
+>
+
+; -- -- 24 14/23 13
+; -- -+ 14 24 23 13 -+ -- 23 24 14 13
+; -- ++ 14 24/13 23 ++ -- 23 13/24 14
+; -+ -+ 14/23 13/24
+; -+ ++ 14 13 23 24 ++ -+ 23 13 14 24
+; ++ ++ 13 14/23 24
+
+-- -+ signs of lower bounds and upper bounds of two intervals (so interval x has negative lower and upper bounds, and interval y has negative lower bound and positive upper bound)
+
+the numbers are the multiplication results of the bounds, from lowest to highest
+1 - lower x, 2 - upper x, 3 - lower y, 4 - upper y
+
+>>
+
+(define (mul-interval x y)
+  (define (mi a b c d)
+      (make-interval (* a b)
+                     (* c d)))
+  (let ((lx (lower-bound x))
+        (ux (upper-bound x))
+        (ly (lower-bound y))
+        (uy (upper-bound y)))
+    (if (negative? lx)
+        (if (negative? ux)
+            (if (negative? ly)
+                (if (negative? uy)
+                    (mi ux uy lx ly)  ; -- --
+                    (mi lx uy lx ly)) ; -- -+
+                (mi lx uy ux ly))     ; -- ++
+            (if (negative? ly)
+                (if (negative? uy)
+                    (mi ux ly lx ly)  ; -+ --
+                    (make-interval (min (* lx uy) (* ux ly))   ; -+ -+
+                                   (max (* lx ly) (* ux uy))))
+                (mi lx uy ux uy)))    ; -+ ++
+        (if (negative? ly)
+            (if (negative? uy)
+                (mi ux ly lx uy)     ; ++ --
+                (mi ux ly ux uy))    ; ++ -+
+            (mi lx ly ux uy)))))     ; ++ ++
+
+>>>
+
+Can revisit this later to improve the implementation
+
+>>>
+
+Testing:
+
+(define (print-interval i)
+  (newline)
+  (display "(")
+  (display (lower-bound i))
+  (display ",")
+  (display (upper-bound i))
+  (display ")"))
+
+; Test
+(print-interval (mul-interval (make-interval -2 -1) (make-interval -2 -1)))
+(print-interval (mul-interval (make-interval -2 -1) (make-interval -1  1)))
+(print-interval (mul-interval (make-interval -2 -1) (make-interval  1  2)))
+(print-interval (mul-interval (make-interval -1  1) (make-interval -2 -1)))
+(print-interval (mul-interval (make-interval -1  1) (make-interval  1  2)))
+(print-interval (mul-interval (make-interval  1  2) (make-interval -2 -1)))
+(print-interval (mul-interval (make-interval  1  2) (make-interval -1  1)))
+(print-interval (mul-interval (make-interval  1  2) (make-interval  1  2)))
+
+(print-interval (mul-interval (make-interval -10 1) (make-interval -1  1)))
+(print-interval (mul-interval (make-interval -1 20) (make-interval -1  1)))
+(print-interval (mul-interval (make-interval -1  1) (make-interval -1 30)))
+(print-interval (mul-interval (make-interval -1  1) (make-interval -40 1)))
+
+Result:
+(1,4)
+(-2,2)
+(-4,-1)
+(-2,2)
+(-2,2)
+(-4,-1)
+(-2,2)
+(1,4)
+(-10,10)
+(-20,20)
+(-30,30)
+(-40,40

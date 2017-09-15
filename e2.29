@@ -1,0 +1,111 @@
+2017.08.16 Wednesday
+e2.29
+
+>
+
+(define (make-mobile left right)
+  (list left right))
+
+(define (make-branch length structure)
+  (list length structure))
+
+>>
+
+a.
+(define (left-branch mobile)
+  (car mobile))
+
+(define (right-branch mobile)
+  (cadr mobile))
+
+(define (branch-length branch)
+  (car branch))
+
+(define (branch-structure branch)
+  (cadr branch))
+
+b.
+
+(define (total-weight-branch branch)
+    (if (not (pair? (branch-structure branch)))
+        (branch-structure branch)
+        (total-weight (branch-structure branch))))
+
+(define (total-weight mobile)
+  (+ (total-weight-branch (left-branch mobile)) (total-weight-branch (right-branch mobile))))
+
+c.
+
+(define (torque branch)
+  (* (branch-length branch) (total-weight-branch branch)))
+
+(define (is-mobile-balanced mobile)
+  (define (ispair)
+    (display "left: ")
+    (display (torque (left-branch mobile)))
+    (newline)
+    (display "right: ")
+    (display (torque (right-branch mobile)))
+    (newline)
+    (and (= (torque (left-branch mobile)) (torque (right-branch mobile)))
+         (is-mobile-balanced (branch-structure (left-branch mobile)))
+         (is-mobile-balanced (branch-structure (right-branch mobile)))))
+  (if (not (pair? mobile))
+      #t
+      (ispair)))
+
+d.
+
+I only need to change the right-branch and branch-structure selectors, specifically to:
+
+(define (right-branch mobile)
+  (cdr mobile))
+
+(define (branch-structure branch)
+  (cdr branch))
+
+>>>
+
+> (define mobile1 (make-mobile (make-branch 10 1) (make-branch 30 2)))
+(define mobile2 (make-mobile (make-branch 5 mobile1) (make-branch 35 50)))
+(define mobile3 (make-mobile (make-branch 15 mobile2) (make-branch 25 mobile1)))
+
+(define mobilea (make-mobile (make-branch 10 2) (make-branch 4 5)))
+(define mobileb (make-mobile (make-branch 10 mobilea) (make-branch 10 mobilea)))
+(define mobilec (make-mobile (make-branch 20 mobilea) (make-branch 10 mobileb)))
+> (is-mobile-balanced mobile1)
+left: 10
+right: 60
+#f
+> (is-mobile-balanced mobile2)
+left: 15
+right: 1750
+#f
+> (is-mobile-balanced mobile3)
+left: 795
+right: 75
+#f
+> (is-mobile-balanced mobilea)
+left: 20
+right: 20
+#t
+> (is-mobile-balanced mobileb)
+left: 70
+right: 70
+left: 20
+right: 20
+left: 20
+right: 20
+#t
+> (is-mobile-balanced mobilec)
+left: 140
+right: 140
+left: 20
+right: 20
+left: 70
+right: 70
+left: 20
+right: 20
+left: 20
+right: 20
+#t

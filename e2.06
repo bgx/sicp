@@ -1,0 +1,72 @@
+2017.07.16 Sunday
+e2.6
+
+(define zero (lambda (f) (lambda (x) x)))
+
+(define (add-1 n)
+  (lambda (f) (lambda (x) (f ((n f) x)))))
+
+>>
+
+*What is one defined directly?
+(add-1 zero)
+(add-1 (lambda (f) (lambda (x) x)))
+(lambda (g) (lambda (y) (g (((lambda (f) (lambda (x) x)) g) y))))
+(lambda (g) (lambda (y) (g ((lambda (x) x) y))))
+(lambda (g) (lambda (y) (g y)))
+
+so
+(define one (lambda (f) (lambda (x) (f x))))
+"one is the function that accepts a function f as a parameter, and returns the function that accepts a parameter x and applies f to x"
+
+>>
+
+*What is two defined directly?
+(add-1 one)
+(add-1 (lambda (f) (lambda (x) (f x))))
+(lambda (g) (lambda (y) (g (((lambda (f) (lambda (x) (f x))) g) y))))
+(lambda (g) (lambda (y) (g ((lambda (x) (g x)) y))))
+(lambda (g) (lambda (y) (g (g y))))
+
+so
+(define two (lambda (f) (lambda (x) (f (f x)))))
+"two is the function that accepts a function f as a parameter, and returns the function that accepts a parameter x and applies f to x twice repeatedly"
+
+>>
+
+*Give a direct definition of the addition procedure
+(define (add m n)
+  (lambda (f) (lambda (x) ((m f) ((n f) x)))))
+
+>>>
+
+All in one place:
+
+(define zero (lambda (f) (lambda (x) x)))
+
+(define one (lambda (f) (lambda (x) (f x))))
+
+(define two (lambda (f) (lambda (x) (f (f x)))))
+
+(define (add-1 n)
+  (lambda (f) (lambda (x) (f ((n f) x)))))
+
+(define (add m n)
+  (lambda (f) (lambda (x) ((m f) ((n f) x)))))
+
+>>>
+
+Can test like so:
+
+((zero inc) 0) --> 0
+((one inc) 0)  --> 1
+((two inc) 3)  --> 5
+
+(define three (add one two))
+(define four (add two two))
+(define seven (add three four))
+
+((three inc) 4) --> 7
+((seven inc) 6) --> 13
+
+

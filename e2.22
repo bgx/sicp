@@ -1,0 +1,30 @@
+2017.07.20 Thursday
+e2.22
+
+>>
+
+The answer list is the reverse order of the one desired because the answer list is being constructed by moving through the input list and prepending each processed item to the answer list -- cons is called with the processed item as the first argument and the existing answer list as the second argument.  So the answer list is build from right to left, in reverse order.
+
+>>
+
+Interchanging the arguments to cons will not result in the desired list structure.
+
+He wants
+
+-->[ . | .-]-->[ . | .-]-->[ . | .-]-->[ . | / ]
+     |		 |	     |           |
+     v           v           v           v
+   [ 1 ]       [ 4 ]       [ 9 ]       [ 16]
+
+but he gets
+
+-->[ . | .-]-->[ 16]
+     |
+     v
+   [ . | .-]-->[ 9 ]
+     |
+     v
+   [ . | .-]-->[ 4 ]
+     |
+     v
+   [ / | .-]-->[ 1 ]

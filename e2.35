@@ -1,0 +1,26 @@
+2017.08.24 Thursday
+e2.35
+
+>>
+
+(define (count-leaves t)
+  (accumulate 
+              +
+              0 
+              (map (lambda (x) 1) (fringe t))))
+
+>>
+
+Another version:
+
+(define (count-leaves t)
+  (accumulate 
+              +
+              0 
+              (map (lambda (items) (length(fringe items))) t)))
+
+>>>
+
+> (define test-tree (list (list (list 1 2) 3 4) 5 6 (list 7 (list 8 9))))
+> (count-leaves test-tree)
+9

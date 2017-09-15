@@ -1,0 +1,21 @@
+2017.07.20 Thursday
+e2.23
+
+>>
+
+(define (for-each proc items)
+  (cond ((not (list? items)) (display "Invalid input: items must be a list")(newline))
+        ((null? items) #t)
+        (else (proc (car items))
+              (for-each proc (cdr items)))))
+
+>>>
+
+Test:
+
+(> (for-each (lambda (x) (newline) (display x))
+          (list 57 321 88))
+
+57
+321
+88#t

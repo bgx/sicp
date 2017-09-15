@@ -1,0 +1,50 @@
+2017.09.11 Monday
+e2.42
+
+>>
+
+(define (queens board-size)
+  (define (vertical-print sequence)
+    (for-each (lambda (x) (display x)(newline)) sequence))
+  ; represents an empty set of positions
+  (define empty-board '())
+  ; adjoins a new row-column position to a set of positions
+  (define (adjoin-position new-row k rest-of-queens)
+    (append rest-of-queens (list (list new-row k))))
+  ; determines for a set of positions, whether the queen in the kth colummn is safe with respect to the others
+  (define (safe? k positions)
+    (define (k-position)
+      (car (filter (lambda (x) (= k (cadr x))) positions)))
+    (define (not-k-positions)
+      (filter (lambda (x) (not (= k (cadr x)))) positions))
+    (define (has-items list)
+      (and (list? list) 
+           (not (null? list))))
+    (define (safe-rows?)
+      (not (has-items (filter 
+                        (lambda (position) 
+                          (= (car (k-position)) (car position)))
+                        (not-k-positions)))))
+    (define (safe-diagonals?)
+      (not (has-items (filter 
+                        (lambda (position) 
+                          (=  (abs (- (car (k-position))
+                                      (car position)))
+                              (abs (- (cadr (k-position))
+                                      (cadr position)))))     
+                        (not-k-positions)))))
+    (if (= k 1)
+        true
+        (and (safe-rows?) (safe-diagonals?))))
+  (define (queen-cols k) 
+    (if (= k 0)
+        (list empty-board)
+        (filter
+          (lambda (positions) (safe? k positions))
+          (flatmap
+            (lambda (rest-of-queens)
+              (map (lambda (new-row)
+                     (adjoin-position new-row k rest-of-queens))
+                   (enumerate-interval 1 board-size)))
+            (queen-cols (- k 1))))))
+  (vertical-print (queen-cols board-size)))

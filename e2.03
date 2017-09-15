@@ -1,0 +1,39 @@
+2017.07.14 Friday
+e2.3
+
+>>
+
+; Functions with rectangle parameter
+(define (perimeter r)
+  (* 2 (+ (length-rect r) (width-rect r))))
+(define (area r)
+  (* (length-rect r) (width-rect r)))
+
+; Rectangle as 4 points
+(define (make-rect-1 p1 p2 p3 p4)
+  (cons (cons p1 p2) (cons p3 p4)))
+(define (p1 r)
+  (car (car r)))
+(define (p2 r)
+  (cdr (car r)))
+(define (p3 r)
+  (car (cdr r)))
+(define (p4 r)
+  (cdr (cdr r)))
+(define (length-segment s)
+  (let ((start (start-segment s))
+        (end   (end-segment s)))
+    (sqrt (+ (square (abs (- (x-point start) (x-point end))))
+             (square (abs (- (y-point start) (y-point end))))))))
+(define (length-rect r1)
+  (length-segment (make-segment (p1 r1) (p2 r1))))
+(define (width-rect r1)
+  (length-segment (make-segment (p2 r1) (p3 r1))))
+
+; Rectangle as length (positive x), width (positive y), anchor point (x y), rotation around anchor point [0,2pi)
+(define (make-rect-2 length width anchor-point rotation)
+  (cons (cons length width) (cons anchor-point rotation)))
+(define (length-rect r2)
+  (car (car r2)))
+(define (width-rect r2)
+  (cdr (car r2)))
