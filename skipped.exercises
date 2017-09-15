@@ -1,0 +1,52 @@
+e1.13
+- I worked on it but got stuck on finding equality in the inductive step of the proof.  I looked at a worked example online and I needed to take advantage of the golden ratio formula on page 38.  Probably worth revisiting at some point for a refresher on mathematical induction.
+
+e1.13.bonus
+
+e1.14
+- The order of growth of the number of steps
+
+e1.25
+e1.26
+e1.27
+e1.28
+- I just need to move on, I've spent way too much time doing nothing on this book.
+
+e1.35
+e1.36
+
+e1.38
+e1.39
+
+e1.40
+e1.41
+
+e1.45
+
+e2.9
+e2.10
+
+e2.11
+- Worked through, but revisit this at some point later -- implementation is ugly and can maybe improve with things learned later in the book (macros?)
+
+e2.12
+e2.13
+
+e2.14
+e2.15
+e2.16
+- you only want to use interval in formula once, but this is not always possible
+
+e2.43
+- Good effort but the estimation of how long the modified version would take can be embellished
+
+e2.44
+e2.45
+e2.46
+e2.47
+e2.48
+e2.49
+e2.50
+e2.51
+e2.52
+- I read through "2.2.4 Example: A Picture Language", but I'm skipping the exercises
