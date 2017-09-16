@@ -1,0 +1,21 @@
+2017.09.16 Saturday
+e2.54
+
+>>
+
+(define (sicp-equal? symbol1 symbol2)
+  (let ((is-symbol1-pair (pair? symbol1))
+        (is-symbol2-pair (pair? symbol2)))
+    (cond ((and is-symbol1-pair is-symbol2-pair) (and (sicp-equal? (car symbol1) (car symbol2))
+                                                      (sicp-equal? (cdr symbol1) (cdr symbol2))))
+          ((or is-symbol1-pair is-symbol2-pair) #f)
+          (else (eq? symbol1 symbol2)))))
+
+>>>
+
+> (sicp-equal? '(1 2 3) '(1 2 3))
+(sicp-equal? (list 1 2 3) (list 1 2 3))
+(sicp-equal? (list 1 (list 2) 3) (list 1 2 3))
+#t
+#t
+#f
