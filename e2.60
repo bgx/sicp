@@ -1,0 +1,40 @@
+2017.09.21 Thursday
+e2.60
+
+>>
+
+element-of-set? remains the same
+
+time-complexity remains O(n)
+
+*note that allowing duplicates raises n
+
+>>
+
+adjoin-set can be changed to:
+
+(define (adjoin-set x set)
+  (cons x set))
+
+time-complexity goes from O(n) to O(1)
+
+>>
+
+intersection-set remains the same
+
+time-complexity remains O(n^2) for two sets of size n
+
+*again, note that allowing duplicates raises n
+
+>>
+
+union-set can be changed to:
+
+(define (union-set set1 set2)
+  (append set1 set2))
+
+time-complexity goes from O(n^2) to O(n) [O(n) because append only iterates through one set to append each of its elements to an accumulation that is initially the entirety of the second set]
+
+>>
+
+This implementation allowing duplicates could be preferred over the non-duplicates implementation in applications where n is large and the building up of sets through adjoin-set and union-set is done frequently enough that the savings from the complexity reductions, of O(n)->O(1) for adjoin-set and O(n^2)->O(n) for union-set, outweigh the costs of higher values of n in the duplicates implementation.

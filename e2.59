@@ -1,0 +1,12 @@
+2017.09.21 Thursday
+e2.59
+
+>>
+
+(define (union-set set1 set2)
+  (define (union-set-iter set1 filled-set)
+    (cond ((null? set1) (append filled-set set2))
+          ((element-of-set? (car set1) set2) 
+           (union-set-iter (cdr set1) filled-set))
+          (else (union-set-iter (cdr set1) (cons (car set1) filled-set)))))
+  (union-set-iter set1 '()))

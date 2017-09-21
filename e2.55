@@ -1,0 +1,22 @@
+2017.09.18 Monday
+e2.55
+
+>>
+
+(car ''abracadabra)
+
+The single quote ' is shorthand for wrapping the following expression in (quote <exp>).  So we can write the above expression as:
+
+(car (quote (quote abracadabra)))
+
+The quote special form returns the character string of the expression it wraps.  No part of the expression inside the quote is evaluated.  With this functionality in mind, it makes sense that when quotes are nested, the outermost quote is evaluated first.
+
+So if we evaluate the outermost quote, it returns the character string (quote abracadabra), so we have:
+
+(car (quote abracadabra))
+
+Note that (quote abracadabra) is still not evaluated.  It is in fact treated as a list of the symbols quote and abracadabra.
+
+car returns the first element of the list, and so we evaluate to:
+
+quote

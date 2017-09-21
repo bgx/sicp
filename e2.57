@@ -1,0 +1,75 @@
+2017.09.20 Wednesday
+e2.57
+
+>>
+
+The same idea of refactoring is applied to the representation of both sums and products.
+
+1. Change (make-sum a1 a2) to (make-sum a1 a2 . a3).
+
+(define (make-sum a1 a2 . a3)
+  (define (make-sum-2-items a1 a2)
+    (cond ((=number? a1 0) a2)
+          ((=number? a2 0) a1)
+          ((and (number? a1) (number? a2)) (+ a1 a2))
+          (else (list '+ a1 a2))))
+  (if (null? a3)
+      (make-sum-2-items a1 a2)
+      (make-sum-with-seq (cons a1 (cons a2 a3)))))
+
+Note that the old (make-sum a1 a2) is now the encapsulated (make-sum-2-items a1 a2).
+
+2. Introduce a (make-sum-with-seq seq) that operates on a list of items that should be summed together.
+
+(define (make-sum-with-seq seq)
+    (cond ((null? (cdr seq)) (car seq))
+          ((pair? (cdr seq))
+           (make-sum (car seq) (make-sum-with-seq (cdr seq))))
+          (else (make-sum (car seq) (cdr seq)))))
+
+3. Modify (augend s) to call into (make-sum-with-seq seq).
+
+(define (augend s) (make-sum-with-seq (cddr s)))
+
+>>
+
+The complete set representations of sums and products:
+
+(define (sum? x)
+  (and (pair? x) (eq? (car x) '+)))
+(define (addend s) (cadr s))
+(define (make-sum-with-seq seq)
+    (cond ((null? (cdr seq)) (car seq))
+          ((pair? (cdr seq))
+           (make-sum (car seq) (make-sum-with-seq (cdr seq))))
+          (else (make-sum (car seq) (cdr seq)))))
+(define (augend s) (make-sum-with-seq (cddr s)))
+(define (make-sum a1 a2 . a3)
+  (define (make-sum-2-items a1 a2)
+    (cond ((=number? a1 0) a2)
+          ((=number? a2 0) a1)
+          ((and (number? a1) (number? a2)) (+ a1 a2))
+          (else (list '+ a1 a2))))
+  (if (null? a3)
+      (make-sum-2-items a1 a2)
+      (make-sum-with-seq (cons a1 (cons a2 a3)))))
+
+(define (product? x)
+  (and (pair? x) (eq? (car x) '*)))
+(define (multiplier p) (cadr p))
+(define (make-product-with-seq seq)
+    (cond ((null? (cdr seq)) (car seq))
+          ((pair? (cdr seq))
+           (make-product (car seq) (make-product-with-seq (cdr seq))))
+          (else (make-product (car seq) (cdr seq)))))
+(define (multiplicand p) (make-product-with-seq (cddr p)))
+(define (make-product m1 m2 . m3)
+  (define (make-product-2-items m1 m2)
+    (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+          ((=number? m1 1) m2)
+          ((=number? m2 1) m1)
+          ((and (number? m1) (number? m2)) (* m1 m2))
+          (else (list '* m1 m2))))
+  (if (null? m3)
+      (make-product-2-items m1 m2)
+      (make-product-with-seq (cons m1 (cons m2 m3)))))

@@ -1,5 +1,5 @@
 #lang sicp
-(#%require (only racket provide time))
+(#%require (only racket provide time error))
 (#%require (rename racket racket-list list))
 ;(#%require (rename racket fold-left foldl))
 ;(#%require (rename racket fold-right foldr))
@@ -199,5 +199,144 @@
 ; map and accumulate with append
 (define (flatmap proc seq)
   (accumulate append '() (map proc seq)))
+
+; 2.3.2
+
+; (e2.56 & e2.57) vvv
+
+; [deriv]e [exp]ression [var]iable
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp)
+         (if (same-variable? exp var) 1 0))
+        ((sum? exp)
+         (make-sum (deriv (addend exp) var)
+                   (deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+          (make-product (multiplier exp)
+                        (deriv (multiplicand exp) var))
+          (make-product (deriv (multiplier exp) var)
+                        (multiplicand exp))))
+        ((exponentiation? exp)
+         (make-product
+          (exponent exp)
+          (make-product
+           (make-exponentiation (base exp) (make-sum (exponent exp) -1))
+           (deriv (base exp) var))))
+        (else
+         (error "unknown expression type -- DERIV" exp))))
+
+(define (variable? x) (symbol? x))
+(define (same-variable? v1 v2)
+  (and (variable? v1) (variable? v2) (eq? v1 v2)))
+(define (=number? exp num)
+  (and (number? exp) (= exp num)))
+
+(define (sum? x)
+  (and (pair? x) (eq? (car x) '+)))
+(define (addend s) (cadr s))
+(define (make-sum-with-seq seq)
+    (cond ((null? (cdr seq)) (car seq))
+          ((pair? (cdr seq))
+           (make-sum (car seq) (make-sum-with-seq (cdr seq))))
+          (else (make-sum (car seq) (cdr seq)))))
+(define (augend s) (make-sum-with-seq (cddr s)))
+(define (make-sum a1 a2 . a3)
+  (define (make-sum-2-items a1 a2)
+    (cond ((=number? a1 0) a2)
+          ((=number? a2 0) a1)
+          ((and (number? a1) (number? a2)) (+ a1 a2))
+          (else (list '+ a1 a2))))
+  (if (null? a3)
+      (make-sum-2-items a1 a2)
+      (make-sum-with-seq (cons a1 (cons a2 a3)))))
+
+(define (product? x)
+  (and (pair? x) (eq? (car x) '*)))
+(define (multiplier p) (cadr p))
+(define (make-product-with-seq seq)
+    (cond ((null? (cdr seq)) (car seq))
+          ((pair? (cdr seq))
+           (make-product (car seq) (make-product-with-seq (cdr seq))))
+          (else (make-product (car seq) (cdr seq)))))
+(define (multiplicand p) (make-product-with-seq (cddr p)))
+(define (make-product m1 m2 . m3)
+  (define (make-product-2-items m1 m2)
+    (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+          ((=number? m1 1) m2)
+          ((=number? m2 1) m1)
+          ((and (number? m1) (number? m2)) (* m1 m2))
+          (else (list '* m1 m2))))
+  (if (null? m3)
+      (make-product-2-items m1 m2)
+      (make-product-with-seq (cons m1 (cons m2 m3)))))
+
+(define (exponentiation? x)
+  (and (pair? x) (eq? (car x) '**)))
+(define (base e) (cadr e))
+(define (exponent e) (caddr e))
+(define (make-exponentiation base exponent)
+  (cond ((=number? exponent 0) 1)
+        ((=number? exponent 1) base)
+        ((and (number? base) (number? exponent)) (expt base exponent))
+        (else (list '** base exponent))))
+
+; (e2.56 & e2.57) ^^^
+
+; 2.3.3
+
+; sets as unordered lists -- a list of its elements in which no element appears more than once
+(define (unordered-impl)
+  (define (element-of-set? x set)
+    (cond ((null? set) #f)
+          ((equal? x (car set)) #t)
+          (else (element-of-set? x (cdr set)))))
+  (define (adjoin-set x set)
+    (if (element-of-set? x set)
+        set
+        (cons x set)))
+  (define (intersection-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) '())
+          ((element-of-set? (car set1) set2)
+           (cons (car set1)
+                 (intersection-set (cdr set1) set2)))
+          (else (intersection-set (cdr set1) set2))))
+  (define (union-set set1 set2)
+    (define (union-set-iter set1 filled-set)
+      (cond ((null? set1) (append filled-set set2))
+            ((element-of-set? (car set1) set2) 
+             (union-set-iter (cdr set1) filled-set))
+            (else (union-set-iter (cdr set1) (cons (car set1) filled-set)))))
+    (union-set-iter set1 '()))
+  (list element-of-set? adjoin-set intersection-set union-set))
+
+; sets as unordered lists, with duplicates allowed
+(define (unordered-impl-duplicates)
+  (define (element-of-set? x set)
+    (cond ((null? set) #f)
+          ((equal? x (car set)) #t)
+          (else (element-of-set? x (cdr set)))))
+  (define (adjoin-set x set)
+    (cons x set))
+  (define (intersection-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) '())
+          ((element-of-set? (car set1) set2)
+           (cons (car set1)
+                 (intersection-set (cdr set1) set2)))
+          (else (intersection-set (cdr set1) set2))))
+  (define (union-set set1 set2)
+    (append set1 set2))
+  (list element-of-set? adjoin-set intersection-set union-set))
+
+(define set-impl (unordered-impl))
+(define (element-of-set? x set)
+  ((car set-impl) x set))
+(define (adjoin-set x set)
+  ((cadr set-impl) x set))
+(define (intersection-set set1 set2)
+  ((caddr set-impl) set1 set2))
+(define (union-set set1 set2)
+  ((cadddr set-impl) set1 set2))
 
 ;;;;;;;;;;;;;; Experimental Below ;;;;;;;;;;;;;;;;;;
