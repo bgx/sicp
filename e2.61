@@ -1,0 +1,14 @@
+2017.09.22 Friday
+e2.61
+
+>>
+
+(define (adjoin-set x set)
+    (cond ((null? set) (list x))
+          ((< x (car set)) (cons x set))
+          ((= x (car set)) set)
+          (else (cons (car set) (adjoin-set x (cdr set))))))
+
+>>>
+
+We scan through the set, and if x is less than or equal to the element of the set currently being examined, we can return a new set -- with either x inserted or not -- without examining the remaining elements of the original set.  We only examine all elements of the original set if x is greater than or equal to the greatest element of the original set.
