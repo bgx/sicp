@@ -1,0 +1,79 @@
+2017.09.25 Monday
+e2.63
+
+>
+
+(define sampletree1 (make-tree 7 (make-tree 3
+                                            (make-tree 1 '() '())
+                                            (make-tree 5 '() '()))
+                                 (make-tree 9
+                                            '()
+                                            (make-tree 11 '() '()))))
+(define sampletree2 (make-tree 3 (make-tree 1 '() '())
+                                 (make-tree 7
+                                            (make-tree 5 '() '())
+                                            (make-tree 9
+                                                       '()
+                                                       (make-tree 11 '() '())))))
+(define sampletree3 (make-tree 5 (make-tree 3
+                                            (make-tree 1 '() '())
+                                            '())
+                                 (make-tree 9
+                                            (make-tree  7 '() '())
+                                            (make-tree 11 '() '()))))
+
+(define (tree->list-1 tree)
+  (if (null? tree)
+      '()
+      (append (tree->list-1 (left-branch tree))
+              (cons (entry tree)
+                    (tree->list-1 (right-branch tree))))))
+(define (tree->list-2 tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree)
+        result-list
+        (copy-to-list (left-branch tree)
+                      (cons (entry tree)
+                            (copy-to-list (right-branch tree)
+                                          result-list)))))
+  (copy-to-list tree '()))
+
+>>
+
+a. I don't see a reason why the two procedures wouldn't produce the same result for every tree.  The procedures evaluate as follows for the trees in figure 2.16:
+> (tree->list-1 sampletree1)
+{1 3 5 7 9 11}
+> (tree->list-2 sampletree1)
+{1 3 5 7 9 11}
+> (tree->list-1 sampletree2)
+{1 3 5 7 9 11}
+> (tree->list-2 sampletree2)
+{1 3 5 7 9 11}
+> (tree->list-1 sampletree3)
+{1 3 5 7 9 11}
+> (tree->list-2 sampletree3)
+{1 3 5 7 9 11}
+
+>>
+
+b. The two procedures do not have the same order of growth in the number of steps required to convert a balanced tree with n elements to a list.
+
+Each procedure is made up of calls to (null? <x>) and (cons <x> <y>).  We'll assign a cost of one step to each of these two procedures.
+
+..tree->list-2..
+Each call to this procedure's inner iterative procedure makes one call to (null? <x>) and one call to (cons <x> <y>) if the tree passed in is not null.  
+
+Limiting the problem to balanced full binary trees with n elements (thus n = 2^(k+1)-1 for some k), we get n calls to (cons <x> <y>), and (n + 2 * ((n+1)/2))=(n+n+1)=2n+1 calls to (null? <x>).  n+2n+1 is time complexity O(n).
+
+..tree->list-1..
+Each call to this procedure makes one call to (null? <x>), and if the tree passed in is not null, one call to (cons <x> <y>) AND one call to (append <x> <y>).
+
+As discussed for the second procedure, we will have 2n+1 calls to (null? <x>), and n calls to (cons <x> <y>).  What about the calls to (append <x> <y>)?
+
+(append <x> <y>) makes one call to (null? <x>) and when the first list argument is not null, a call to (cons <x> <y>) and a call to itself.  If the first list argument has m elements, that call to (append <x> <y>) will in total make m+1 calls to (null? <x>), and m calls to (cons <x> <y>) -- 2m+1 in total.
+
+For a balanced full binary tree with n elements, the first call to tree->list-1 where the root is the entry will result in 2*(n/2)+1 or n+1 steps from append.  And each of its two branches will ring up 2*(n/4)+1=n/2+1 steps from append.  Each level of the binary tree will cost n+1 steps from append.  The binary tree has log n levels.  This is O(n log n) growth.
+
+Adding the n+2n+1 calls that are directly in the tree->list-1 procedure does not change the O(n log n) growth that comes from the append calls.
+
+So we have O(n log n) grown for tree->list-1, which grows more quickly than the O(n) growth of tree->list-2!
