@@ -1,0 +1,23 @@
+2017.09.26 Tuesday
+e2.64
+
+>>
+
+a.
+
+partial-tree picks out an entry value in the middle of the first n elements of the list, and calls itself recursively to make two partial trees out of the remaining n-1 elements: one made from the elements to the left of the entry value, and one made from the elements to the right of the entry value.  A tree data structure is created from the entry value, the left partial tree and right partial tree, and this tree data structure is returned along with the elements of the list that came after the first n elements.
+
+Tree produced by (list->tree '(1 3 5 7 9 11)):
+
+    5
+  _/ \_
+ /     \
+1       9
+ \     / \
+  3   7   11
+
+>>
+
+b.
+
+One call to cons and one call to make-tree are performed for each of the n elements of the tree, and so the time complexity if O(n).

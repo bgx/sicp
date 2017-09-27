@@ -1,0 +1,24 @@
+2017.09.26 Tuesday
+e2.65
+
+>>
+
+Use the O(n) time-complexity tree->list to convert a balanced binary tree to an ordered list.
+
+Then use the O(n) time-complexity ordered list implementations of intersection-set and union-set to created an ordered list with the correct values.
+
+Then use the O(n) time-complexity list->tree to convert the ordered list to a balanced binary tree.
+
+Each of the three parts is O(n), and the overall procedure is O(n).
+
+>>
+
+  (define (intersection-set set1 set2)
+    (list->tree ((caddr (ordered-list-impl)) (tree->list set1) (tree->list set2))))
+  (define (union-set set1 set2)
+    (list->tree ((cadddr (ordered-list-impl)) (tree->list set1) (tree->list set2))))
+
+where (caddr (ordered-list-impl)) is the ordered list implementation of intersection-set, and
+
+      (cadddr (ordered-list-impl)) is the ordered list implementation of union-set.
+      

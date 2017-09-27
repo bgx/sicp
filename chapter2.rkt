@@ -391,13 +391,9 @@
                       (left-branch set)
                       (adjoin-set x (right-branch set))))))
   (define (intersection-set set1 set2)
-    (cond ((or (null? set1) (null? set2)) '())
-          ((element-of-set? (car set1) set2)
-           (cons (car set1)
-                 (intersection-set (cdr set1) set2)))
-          (else (intersection-set (cdr set1) set2))))
+    (list->tree ((caddr (ordered-list-impl)) (tree->list set1) (tree->list set2))))
   (define (union-set set1 set2)
-    (append set1 set2))
+    (list->tree ((cadddr (ordered-list-impl)) (tree->list set1) (tree->list set2))))
   (list element-of-set? adjoin-set intersection-set union-set))
 
 (define (entry tree) (car tree))
@@ -424,6 +420,12 @@
                                  (make-tree 9
                                             (make-tree  7 '() '())
                                             (make-tree 11 '() '()))))
+(define sampletree4 (make-tree 6 (make-tree 4
+                                            (make-tree 2 '() '())
+                                            '())
+                                 (make-tree 10
+                                            (make-tree  8 '() '())
+                                            (make-tree 12 '() '()))))
 
 (define (tree->list tree)
   (define (copy-to-list tree result-list)
@@ -434,6 +436,25 @@
                             (copy-to-list (right-branch tree)
                                           result-list)))))
   (copy-to-list tree '()))
+
+(define (list->tree elements)
+  (car (partial-tree elements (length elements))))
+
+(define (partial-tree elts n)
+  (if (= n 0)
+      (cons '() elts)
+      (let ((left-size (quotient (- n 1) 2)))
+        (let ((left-result (partial-tree elts left-size)))
+          (let ((left-tree (car left-result))
+                (non-left-elts (cdr left-result))
+                (right-size (- n (+ left-size 1))))
+            (let ((this-entry (car non-left-elts))
+                  (right-result (partial-tree (cdr non-left-elts)
+                                              right-size)))
+              (let ((right-tree (car right-result))
+                    (remaining-elts (cdr right-result)))
+                (cons (make-tree this-entry left-tree right-tree)
+                      remaining-elts))))))))
 
 
 (define set-impl (binary-tree-impl))
