@@ -1,0 +1,7 @@
+2017.09.28 Thursday
+e2.67
+
+>>
+
+> (decode sample-message sample-tree)
+{A D A B B C A}
