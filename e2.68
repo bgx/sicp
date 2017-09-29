@@ -1,0 +1,40 @@
+2017.09.29 Friday
+e2.68
+
+>>
+
+(define (encode message tree)
+  (if (null? message)
+      '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+
+(define (encode-symbol symbol tree)
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((equal? x (car set)) true)
+          (else (element-of-set? x (cdr set)))))
+  (define (encode-symbol-1 tree output)
+    (cond ((leaf? tree) output)
+          ((element-of-set? symbol (symbols (left-branch tree)))
+           (encode-symbol-1 (left-branch tree) (append output '(0))))
+          ((element-of-set? symbol (symbols (right-branch tree)))
+           (encode-symbol-1 (right-branch tree) (append output '(1))))
+          (else (error "symbol is not in tree -- ENCODE-SYMBOL:" symbol))))
+  (encode-symbol-1 tree '()))
+
+>>>
+
+(define sample-tree
+  (make-code-tree (make-leaf 'A 4)
+                  (make-code-tree
+                   (make-leaf 'B 2)
+                   (make-code-tree (make-leaf 'D 1)
+                                   (make-leaf 'C 1)))))
+
+(define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+
+;> (encode '(A D A B B C A) sample-tree)
+;{0 1 1 0 0 1 0 1 0 1 1 1 0}
+
+

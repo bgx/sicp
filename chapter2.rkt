@@ -343,9 +343,6 @@
                                (cadr pair))  ; frequency
                     (make-leaf-set (cdr pairs))))))
 
-
-;;;;;;;;;;;;;; Experimental Below ;;;;;;;;;;;;;;;;;;
-
 (define sample-tree
   (make-code-tree (make-leaf 'A 4)
                   (make-code-tree
@@ -355,5 +352,30 @@
 
 (define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
 
+(define (encode message tree)
+  (if (null? message)
+      '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+
+(define (encode-symbol symbol tree)
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((equal? x (car set)) true)
+          (else (element-of-set? x (cdr set)))))
+  (define (encode-symbol-1 tree output)
+    (cond ((leaf? tree) output)
+          ((element-of-set? symbol (symbols (left-branch tree)))
+           (encode-symbol-1 (left-branch tree) (append output '(0))))
+          ((element-of-set? symbol (symbols (right-branch tree)))
+           (encode-symbol-1 (right-branch tree) (append output '(1))))
+          (else (error "symbol is not in tree -- ENCODE-SYMBOL:" symbol))))
+  (encode-symbol-1 tree '()))
+
 ;> (decode sample-message sample-tree)
 ;{A D A B B C A}
+
+;> (encode '(A D A B B C A) sample-tree)
+;{0 1 1 0 0 1 0 1 0 1 1 1 0}
+
+;;;;;;;;;;;;;; Experimental Below ;;;;;;;;;;;;;;;;;;
