@@ -1,0 +1,30 @@
+2017.10.04 Wednesday
+e2.71
+
+>
+
+(n=5)
+Symbols and Frequencies:
+A 16 (2^5)
+B 8  (2^4)
+C 4  .
+D 2  .
+E 1  (2^1)
+
+>>
+
+   (A B C D E) 31
+_________/\_________
+A 16             (B C D E) 15
+            _________/\________
+          B 8                  (C D E) 7
+                         _________/\________
+                       C 4                  (D E) 3
+                                     _________/\________
+                                   D 2                  E 1
+
+>>
+
+(For general n)
+Bits required to encode the most frequent symbol:  1
+Bits required to encode the least frequent symbol: n-1
