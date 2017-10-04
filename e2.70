@@ -1,0 +1,57 @@
+2017.10.03 Tuesday
+e2.70
+
+>
+
+(define 50s-rock-pairs '((A 2) (BOOM 1) (GET 2) (JOB 2) (NA 16) (SHA 3) (YIP 9) (WAH 1)))
+(define 50s-rock-message '(GET A JOB SHA
+                           NA NA NA NA NA NA NA NA
+                           GET A JOB
+                           SHA NA NA NA NA NA NA NA NA
+                           WAH YIP YIP YIP YIP YIP YIP YIP YIP YIP
+                           SHA BOOM))
+
+>>
+
+(define 50s-rock-tree (generate-huffman-tree 50s-rock-pairs))
+
+(define encoded-message (encode 50s-rock-message 50s-rock-tree))
+
+;Verify that decoded message matches message that was encoded
+(define decoded-message (decode encoded-message 50s-rock-tree))
+(define (verify-message-equality input-message output-message)
+  (begin
+    (display "Input message:  ")
+    (display input-message)
+    (newline)
+    (display "Output message: ")
+    (display output-message)
+    (newline)
+    (display "encoded message matches decoded message: ")
+    (equal? input-message output-message)))
+(define (verify-50s-rock-encoding)
+  (verify-message-equality 50s-rock-message decoded-message))
+
+> (verify-50s-rock-encoding)
+Input message:  (GET A JOB SHA NA NA NA NA NA NA NA NA GET A JOB SHA NA NA NA NA NA NA NA NA WAH YIP YIP YIP YIP YIP YIP YIP YIP YIP SHA BOOM)
+Output message: (GET A JOB SHA NA NA NA NA NA NA NA NA GET A JOB SHA NA NA NA NA NA NA NA NA WAH YIP YIP YIP YIP YIP YIP YIP YIP YIP SHA BOOM)
+encoded message matches decoded message: #t
+
+>>
+
+(display "Number of bits required for encoding: ")
+(length encoded-message)
+
+>Number of bits required for encoding: 84
+
+>>
+
+Smallest number of bits required to encode 50s-rock-message if we used a fixed-length code for the eight-symbol alphabet:
+
+log2(8 symbols) = 3 bits per symbol
+50s-rock-message is 36 symbols in length
+3 bits/symbol * 36 symbols = 108
+
+>>>
+
+Encoding with the huffman coding uses 84/108, or 77.7%, of the bits needed to encode with a fixed-length code.

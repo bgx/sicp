@@ -1,0 +1,74 @@
+2017.10.03 Tuesday
+e2.69
+
+>
+
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+
+>>
+
+(define (successive-merge items)
+  (if (null? (cdr items))
+      (car items)
+      (successive-merge (adjoin-set (make-code-tree (car items) (cadr items)) (cddr items)))))
+
+>>>
+
+The above procedure creates a minimum variance huffman code.
+
+Using the following procedure to print encodings for a list of symbols when using a certain tree
+
+(define (print-encoded tree symbols)
+  (if (null? symbols)
+      #t
+      (begin (display (car symbols)) (display " ") (display (encode (list (car symbols)) tree))
+             (newline)
+             (print-encoded tree (cdr symbols)))))
+
+we can evaluate (using examples from exercise 2.70)
+
+(print-encoded 50s-rock-tree '(NA YIP SHA A GET JOB BOOM WAH))
+
+to get
+
+NA (0)
+YIP (1 0)
+SHA (1 1 1 0)
+A (1 1 0 0)
+GET (1 1 1 1 1)
+JOB (1 1 1 1 0)
+BOOM (1 1 0 1 1)
+WAH (1 1 0 1 0).
+
+We can see an example of a huffman coding without minimum variance if we use the following procedure in place of successive-merge:
+
+(define (successive-merge-2 items)
+  (define (adjoin-tree-before-leaf tree set)
+    (cond ((null? set) (list tree))
+          ((< (weight tree) (weight (car set))) (cons tree set))
+          ((= (weight tree) (weight (car set)))
+           (if (leaf? (car set))
+               (cons tree set)
+               (cons (car set)
+                      (adjoin-tree-before-leaf tree (cdr set)))))
+          (else (cons (car set)
+                      (adjoin-tree-before-leaf tree (cdr set))))))
+  (if (null? (cdr items))
+      (car items)
+      (successive-merge-2 (adjoin-tree-before-leaf (make-code-tree (car items) (cadr items)) (cddr items)))))
+
+Then the call to 
+
+(print-encoded 50s-rock-tree '(NA YIP SHA A GET JOB BOOM WAH))
+
+outputs
+
+NA (0)
+YIP (1 0)
+SHA (1 1 1 0)
+A (1 1 0 1)
+GET (1 1 0 0)
+JOB (1 1 1 1 1)
+BOOM (1 1 1 1 0 1)
+WAH (1 1 1 1 0 0).

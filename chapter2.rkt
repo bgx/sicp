@@ -378,4 +378,13 @@
 ;> (encode '(A D A B B C A) sample-tree)
 ;{0 1 1 0 0 1 0 1 0 1 1 1 0}
 
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+
+(define (successive-merge items)
+  (if (null? (cdr items))
+      (car items)
+      (successive-merge (adjoin-set (make-code-tree (car items) (cadr items)) (cddr items)))))
+
 ;;;;;;;;;;;;;; Experimental Below ;;;;;;;;;;;;;;;;;;
+
