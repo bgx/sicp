@@ -1,0 +1,34 @@
+2017.10.04 Wednesday
+e2.72
+
+>
+
+From e2.68:
+
+(define (encode message tree)
+  (if (null? message)
+      '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+
+(define (encode-symbol symbol tree)
+  (define (element-of-set? x set)
+    (cond ((null? set) false)
+          ((equal? x (car set)) true)
+          (else (element-of-set? x (cdr set)))))
+  (define (encode-symbol-1 tree output)
+    (cond ((leaf? tree) output)
+          ((element-of-set? symbol (symbols (left-branch tree)))
+           (encode-symbol-1 (left-branch tree) (append output '(0))))
+          ((element-of-set? symbol (symbols (right-branch tree)))
+           (encode-symbol-1 (right-branch tree) (append output '(1))))
+          (else (error "symbol is not in tree -- ENCODE-SYMBOL:" symbol))))
+  (encode-symbol-1 tree '()))
+
+>>
+
+Most frequent
+Not dependent on n, just a few operations...check branch of left symbol and it is there, append 0, return from next iteration since next input is a leaf...this takes a number of steps bounded by a constant that is independent of n => O(1)
+
+Least frequent
+n-1 levels of O(n) searches for symbol and O(n) append operations => O(n^2)
