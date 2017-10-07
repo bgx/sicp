@@ -1,0 +1,41 @@
+2017.10.06 Friday
+e2.73
+
+>>
+
+a. Instead of a checking the operator of (deriv exp var)'s exp parameter and providing implementations within (deriv exp var) for different values of that operator, we have (deriv exp var) acquire and apply an implementation from a separate table that is indexed by operator.  Thus, a new implementation for a new operator can be added to the table -- an implementation that can be used within (deriv exp var) -- without changing deriv itself.
+
+We can't assimilate the predicates number? and same-variable? because there is no operator to check in these cases; it is a number or variable with no operator, and we can't acquire an implementation from the table indexed by operator with no operator.
+
+b,c. 
+
+(define put (lambda (x y z) (display "put-placeholder")))
+(define (install-deriv-package)
+  ;internal procedures
+  (define (deriv-sum operands var)
+    (make-sum (deriv (car operands) var)
+              (deriv (cdr operands) var)))
+  (define (deriv-product operands var)
+    (make-sum
+      (make-product (car operands)
+                    (deriv (cdr operands) var))
+      (make-product (deriv (car operands) var)
+                    (cdr operands))))
+  (define (deriv-exponentiation operands var)
+    (make-product
+      (exponent (car operands))
+      (make-product
+        (make-exponentiation (base (car operands)) (make-sum (exponent (car operands)) -1))
+        (deriv (base (car operands)) var))))
+  ;interface to the rest of the system
+  (put 'deriv '+ deriv-sum)
+  (put 'deriv '* deriv-product)
+  (put 'deriv '** deriv-exponentiation))
+
+d.
+
+We would just need to swap the 'deriv and '<operator> in our calls to put:
+
+  (put '+ 'deriv deriv-sum)
+  (put '* 'deriv deriv-product)
+  (put '** 'deriv deriv-exponentiation)

@@ -1,0 +1,38 @@
+2017.10.07 Saturday
+e2.74
+
+>>
+
+a.
+
+(define (get-record employee-name personnel-file)
+  ((get 'get-record (get-personnel-file-type personnel-file)) employee-name personnel-file))
+
+The individual divisions' files should be structured to make available (a) a personnel-file-type that can be acquired by the get-personnel-file-type procedure, and (b) a set of employee records, represented in any valid way a set can be represented.
+
+We could make a globally available get-personnel-file-contents procedure that gets the set of employee records, and make each division file be structured to work with that procedure; or we can just allow the get-record procedure for each type deal with getting at the set of employee records.
+
+b.
+
+(define (get-salary employee-record)
+  ((get 'get-salary (get-employee-record-type employee-record)) employee-record))
+
+The employee record should be structured to make available (a) an employee-record-type that can be acquired by the get-employee-record-type procedure, and (b) a set of records of information that are keyed by the type of information they hold, e.g. address and salary.
+
+The get procedures from a. and b. should be able to operate on the same table without problem.
+
+c.
+
+(define (find-employee-record employee-name personnel-files)
+  (if (null? personnel-files)
+      '()
+      (let ((record (get-record employee-name (car personnel-files))))
+        (if (null? record)
+            (find-employee-record employee-name (cdr personnel-files))
+            record))))
+
+Works under the assumption that get-record will return '() if no employee record is found for the given employee-name.  We could use #f or false instead of '() just as well.
+
+d.
+
+They must install implementations of get-record, get-salary, etc. into a table with the put procedure, under the type that these procedures operate on (which would be a symbol of their division, like 'divisionA).
