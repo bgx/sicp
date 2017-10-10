@@ -1,0 +1,32 @@
+2017.10.09 Monday
+e2.76
+
+>>
+
+Describe the changes that must be made to a system in order to add new types or new operations
+
+Generic operations with explicit dispatch
+. Create a predicate to recognize the new types
+. Create procedures to make data tagged with the new types
+. Create an implementation of each generic procedure for the new type (*these procedures need names that do not conflict with the other implementations of the generic procedures)
+. Modify each generic procedure to dispatch to the new type implementation when the data is of the new type
+
+Data-directed style
+. Write a procedure to install a package for the new type that includes:
+ - internal procedures that implement each generic procedure for the new type (*these implementation procedures can be the same name as the generic procedures they are implementing, since the procedures are internal to the package installation procedure)
+ - procedure calls that put the internal implementation procedures into a table keyed by operation and type 
+. The generic code written to dispatch to the table containing operation implementations for each type does *not* need to be changed
+
+Message-passing style
+. Write one procedure for the new type that returns a procedure that takes as input the required operation name and performs the operation indicated
+. Each of these performed operation needs an implementation that can be called from within the returned procedure
+
+>>
+
+Which would be most appropriate for a system in which...
+...new types must often be added?
+...new operations must often be added?
+
+Data-directed style and message-passing style will require just about the same amount of code to add either a new type or a new operation.
+
+One mechanism that can be done in data-directed style that cannot be done in message-passing style (at least as far as I know right now) is to have a procedure that installs implementations of an operation for a large number of types, so that the implementations of the operation for each type would be in one place.  This could provide an advantage if new operations are often added.
