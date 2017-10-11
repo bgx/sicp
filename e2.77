@@ -1,0 +1,22 @@
+2017.10.10 Tuesday
+e2.77
+
+>>
+
+    (magnitude z)
+evaluates to
+    (apply-generic 'magnitude z)
+This will dispatch to the operation keyed by 'magnitude and 'complex, which is one of the operations installed with the lines in the Exercise 2.77 instructions, with the argument being the contents of z, which we'll call y.  So then this evaluates to
+    (magnitude y)
+evaluates to
+    (apply-generic 'magnitude y)
+This will dispatch to the operation keyed by 'magnitude and 'rectangular, which was installed with the install-rectangular-package procedure, with the argument being the contents of y, which we'll call x.  So then this evaluates to
+    (sqrt (+ (square (real-part x)) (square (imag-part x))))
+The real-part and imag-part procedures called here will be those found internally to the install-rectangular-package procedure, so this evaluates to
+    (sqrt (+ (square (car x)) (square (cdr x))))
+evaluates to
+    (sqrt (+ (square 3) (square 4)))
+...evaluates to...
+    5
+    
+So, apply-generic is invoked twice, once to direct to a 'complex operation, and once more to direct to a 'rectangular operation.
