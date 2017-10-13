@@ -1,0 +1,24 @@
+2017.10.12 Thursday
+e2.79
+
+>>
+
+(define (equ? x y) (apply-generic 'equ? x y))
+
+; inside the definition of install-scheme-number-package
+(put 'equ? '(scheme-number scheme-number)
+     (lambda (x y) (= x y)))
+
+; inside the definition of install-rational-package
+(put 'equ? '(rational rational)
+     (lambda (x y) (and (= (numer x) (numer y))
+                        (= (denom x) (denom y)))))
+
+; inside the definition of install-complex-package
+(put 'equ? '(complex complex)
+     (lambda (x y) (and (= (real-part x) (real-part y))
+                        (= (imag-part x) (imag-part y)))))
+                        
+>>>
+
+The 'equ? '(complex complex) could call equ? again and dispatch to separate implementations for rectangular and polar.  But polar gets tricky because [angle == angle + 2*pi*k for any integer k].  To bring angles within [0, 2*pi) for comparison without using cos and sin, I think I would need to use an approximation of pi, which probably isn't much better than using cos and sin once to compare real and imaginary parts.  You would probably want to add some tolerance for floating point calculation error.  I'm not going to worry about it for this exercise.

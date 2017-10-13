@@ -1,0 +1,18 @@
+2017.10.12 Thursday
+e2.80
+
+>>
+
+(define (zero? x y) (apply-generic 'zero? x y))
+
+; inside the definition of install-scheme-number-package
+(put 'zero? '(scheme-number)
+     (lambda (x) (= x 0)))
+
+; inside the definition of install-rational-package
+(put 'zero? '(rational)
+     (lambda (x) (= (numer x) 0)))
+
+; inside the definition of install-complex-package
+(put 'zero? '(complex)
+     (lambda (x) (= (magnitude x) 0)))
