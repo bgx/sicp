@@ -1,0 +1,35 @@
+2017.10.14 Saturday
+e2.81
+
+>>
+
+a. apply-generic will not find a procedure for exponentiation for two complex numbers and then will attempt to coerce the arguments.  If there is a procedure to coerce the the first argument to the second argument's type or a procedure to coerce the second argument to the first argument's type, then apply-generic will coerce the arguments to be of the same type and call itself with the successfully coerced arguments.  Since there is a procedure to coerce complex to complex, apply-generic will coerce the arguments.  But this doesn't change the type of either argument from complex, and apply-generic will be called again with two complex arguments.  apply-generic will fail to find an exponentiation procedure, and the same cycle will repeat endlessly.
+
+b. Louis is incorrect -- if a generic procedure for arguments of the same type is not available, then apply-generic should fail.  Providing procedures to coerce arguments to their own type does nothing to solve the problem that there will still be no available generic procedure for arguments of that type.
+
+c.
+
+(define (apply-generic op . args)
+  (define (raise-error op type-tags)
+    (error "No method for these types"
+                     (list op type-tags)))
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (apply proc (map contents args))
+          (if (= (length args) 2)
+              (let ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (if (eq? type1 type2)
+                    (raise-error op type-tags)
+                    (let ((t1->t2 (get-coercion type1 type2))
+                          (t2->t1 (get-coercion type2 type1)))
+                      (cond (t1->t2
+                             (apply-generic op (t1->t2 a1) a2))
+                            (t2->t1
+                             (apply-generic op a1 (t2->t1 a2)))
+                            (else
+                             (raise-error op type-tags))))))
+              (raise-error op type-tags))))))
