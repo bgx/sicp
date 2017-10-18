@@ -1,0 +1,31 @@
+2017.10.18 Wednesday
+e2.84
+
+>>
+
+(define number-type-tower '(complex real rational integer))
+
+(define (apply-generic op . args)
+  (define (raise-error op type-tags)
+    (error "No method for these types"
+                     (list op type-tags)))
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (apply proc (map contents args))
+          (if (= (length args) 2)
+              (let ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (if (eq? type1 type2)
+                    (raise-error op type-tags)
+                    (let ((t1-line (memq type1 number-type-tower))
+                          (t2-line (memq type2 number-type-tower)))
+                      (cond ((memq type1 t2-line) ; type1 is below type2
+                             (apply-generic op (raise a1) a2))
+                            ((memq type2 t1-line) ; type2 is below type1
+                             (apply-generic op a1 (raise a2)))
+                            (else
+                             (raise-error op type-tags))))))
+              (raise-error op type-tags))))))

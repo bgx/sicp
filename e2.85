@@ -1,0 +1,54 @@
+2017.10.18 Wednesday
+e2.85
+
+>>
+
+(define (project x) (apply-generic 'project x))
+(put 'project 'complex
+     (lambda (x) (make-real (real-part x) 1)))
+; From MIT/GNU Scheme 9.2, Section 4.5 Numberical Operations:
+; "In MIT/GNU Scheme the rational? procedure is the same as real?"
+; I'm going to take this to mean we can assume all irrational
+; numbers are represented with a rational approximation in MIT/GNU Scheme.
+(put 'project 'real
+     (lambda (x) (make-rational (numerator x) (denominator x))))
+(put 'project 'rational
+     (lambda (x) (round (/ (numer x) (denom x)))))
+(put 'project 'integer
+     (lambda (x) x))
+
+(define (drop x)
+  (let ((projected-x (project x)))
+    (if (and (not (eq? (type-tag x) (type-tag projected-x)))
+             (equ? x (raise projected-x)))
+        (drop projected-x)
+        x)))
+
+(define (apply-generic op . args)
+  (define (raise-error op type-tags)
+    (error "No method for these types"
+                     (list op type-tags)))
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (drop (apply proc (map contents args)))
+          (if (= (length args) 2)
+              (let ((type1 (car type-tags))
+                    (type2 (cadr type-tags))
+                    (a1 (car args))
+                    (a2 (cadr args)))
+                (if (eq? type1 type2)
+                    (raise-error op type-tags)
+                    (let ((t1-line (memq type1 number-type-tower))
+                          (t2-line (memq type2 number-type-tower)))
+                      (cond ((memq type1 t2-line) ; type1 is below type2
+                             (apply-generic op (raise a1) a2))
+                            ((memq type2 t1-line) ; type2 is below type1
+                             (apply-generic op a1 (raise a2)))
+                            (else
+                             (raise-error op type-tags))))))
+              (raise-error op type-tags))))))
+
+>>>
+
+I should probably be checking if the type of the returned value is even in the type tower before passing it to drop.  I'm not going to take any time to do that now though.
