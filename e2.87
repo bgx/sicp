@@ -1,0 +1,17 @@
+2017.10.18 Wednesday
+e2.87
+
+>>
+
+To be placed in the definition of install-polynomial-package:
+
+(define (=zero?-poly p)
+  (define (=zero?-poly-iter terms)
+    (cond ((empty-termlist? terms) true)
+          ((not (=zero? (first-term terms))) false)
+          (else (=zero?-poly-iter (rest-terms terms)))))
+  (=zero?-poly-iter (term-list p)))
+
+along with
+
+(put '=zero? '(polynomial) =zero?-poly)
