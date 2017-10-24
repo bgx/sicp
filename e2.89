@@ -1,0 +1,23 @@
+2017.10.22 Monday
+e2.89
+
+>>
+
+;; these will be the same:
+
+(define (the-empty-termlist) '())
+(define (rest-terms term-list) (cdr term-list))
+(define (empty-termlist? term-list) (null? term-list))
+(define (make-term order coeff) (list order coeff))
+(define (order term) (car term))
+(define (coeff term) (cadr term))
+
+;; these are modified:
+
+(define (adjoin-term term term-list)
+  (let ((term-coeff (coeff term)))
+    (cond ((=zero? term-coeff) term-list)
+          ((equ? (order term) (length term-list)) (cons term-coeff term-list))
+          (else (adjoin-term term (cons 0 term-list))))))
+      
+(define (first-term term-list) (make-term (- (length term-list) 1) (car term-list)))
