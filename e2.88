@@ -1,0 +1,34 @@
+2017.10.23 Monday
+e2.88
+
+>>
+
+;; in install-polynomial-package
+
+  (define (negate-poly p)
+    (make-poly (variable p)
+               (map
+                (lambda (term)
+                  (make-term (order term) (negate (coeff term))))
+                (term-list p))))
+  
+  (put 'negate '(polynomial)
+       (lambda (p) (tag (negate-poly p))))
+  (put 'sub '(polynomial polynomial)
+       (lambda (p1 p2) (tag (add-poly p1 (negate p2)))))
+
+(define (negate x) (apply-generic 'negate x))
+
+;; in install-scheme-number-package
+(put 'negate '(scheme-number)
+     (lambda (x) (tag (- x))))
+;; in install-rational-package
+(put 'negate '(rational)
+     (lambda (x) (tag (make-rat (negate (numer x)) (denom x)))))
+;; in install-complex-package
+(put 'negate '(complex)
+     (lambda (x) (tag (make-from-real-imag (negate (real-part x)) (negate (imag-part x))))))
+     
+>>>
+
+The use of map inside negate-poly is a great example of the application of map
