@@ -1,0 +1,15 @@
+2017.10.27 Friday
+e3.1
+
+>>
+
+(define (make-accumulator sum)
+  (lambda (x)
+    (set! sum (+ sum x))
+    sum))
+
+>>>
+
+Note that no use of begin is necessary
+
+pg. 221 footnote 3, "in Scheme the body of a procedure can be a sequence of expressions" (i.e. begin is implicit in the body of procedures)
