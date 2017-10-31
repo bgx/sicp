@@ -1,0 +1,87 @@
+2017.10.30 Monday
+e3.4
+
+>>
+
+(define (make-account balance password)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (dispatch m)
+    (cond ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Unknown request -- MAKE-ACCOUNT"
+                       m))))
+                       
+  (define incorrect-password-count 0)
+  (define (call-the-cops)
+    (newline)
+    (display "Warning: call-the-cops invoked"))
+  (define (dispatch-with-password-check pass msg)
+    (cond ((eq? password pass)
+           (set! incorrect-password-count 0)
+           (dispatch msg))
+          ((> incorrect-password-count 6)
+           (lambda (amount) (call-the-cops)))
+          (else
+           (set! incorrect-password-count (+ incorrect-password-count 1))
+           (lambda (amount) (newline) (display "Incorrect password - ") (display incorrect-password-count)))))
+  dispatch-with-password-check)
+
+>>>
+
+Small low-quality test for sanity check:
+
+(define (test-make-account)
+  (define acc (make-account 100 'secret-password))
+  
+  (display ((acc 'secret-password 'deposit) 5000))
+
+  ((acc 'secret-passwrd 'withdraw) 1100)
+  ((acc 'secret-passwrd 'withdraw) 1200)
+  ((acc 'secret-passwrd 'withdraw) 1300)
+  ((acc 'secret-passwrd 'withdraw) 1400)
+  ((acc 'secret-passwrd 'withdraw) 1500)
+  ((acc 'secret-passwrd 'withdraw) 1600)
+  ((acc 'secret-passwrd 'withdraw) 1700)
+
+  (newline)
+  (display ((acc 'secret-password 'withdraw) 2000))
+  (newline)
+  (display ((acc 'secret-password 'deposit) 100))
+
+  ((acc 'secret-passwrd 'withdraw) 1100)
+  ((acc 'secret-passwrd 'withdraw) 1200)
+  ((acc 'secret-passwrd 'withdraw) 1300)
+  ((acc 'secret-passwrd 'withdraw) 1400)
+  ((acc 'secret-passwrd 'withdraw) 1500)
+  ((acc 'secret-passwrd 'withdraw) 1600)
+  ((acc 'secret-passwrd 'withdraw) 1700)
+  ((acc 'secret-passwrd 'withdraw) 1800)
+  )
+  
+Which outputs:
+> (test-make-account)
+5100
+Incorrect password - 1
+Incorrect password - 2
+Incorrect password - 3
+Incorrect password - 4
+Incorrect password - 5
+Incorrect password - 6
+Incorrect password - 7
+3100
+3200
+Incorrect password - 1
+Incorrect password - 2
+Incorrect password - 3
+Incorrect password - 4
+Incorrect password - 5
+Incorrect password - 6
+Incorrect password - 7
+Warning: call-the-cops invoked
