@@ -1,0 +1,45 @@
+2017.11.1 Wednesday
+e3.5
+
+>
+
+Given
+
+(define (monte-carlo trials experiment)
+  (define (iter trials-remaining trials-passed)
+    (cond ((= trials-remaining 0)
+           (/ trials-passed trials))
+          ((experiment)
+           (iter (- trials-remaining 1) (+ trials-passed 1)))
+          (else
+           (iter (- trials-remaining 1) trials-passed))))
+  (iter trials 0))
+
+(define (random-in-range low high)
+  (let ((range (- high low)))
+    (+ low (random range))))
+
+>>
+
+(define (random-in-range-float low high)
+    (let ((c 1000000000))
+      (/ (random-in-range (* c low) (* c high)) (exact->inexact c))))
+
+(define (estimate-integral P x1 x2 y1 y2 trials)
+  (define (experiment)
+    (P (random-in-range-float x1 x2) (random-in-range-float y1 y2)))
+  (monte-carlo trials experiment))
+
+(define (estimate-pi trials)
+  (define (is-within-unit-circle? x y)
+    (<= (+ (square x) (square y)) 1.0))
+  (let ((x1 -2) (x2 2)
+        (y1 -2) (y2 2))
+    (let ((rectangle-area (* (- x2 x1) (- y2 y1))))
+      (* (exact->inexact rectangle-area)
+         (estimate-integral is-within-unit-circle? x1 x2 y1 y2 trials)))))
+         
+>>>
+
+> (estimate-pi 10000000)
+3.1447616

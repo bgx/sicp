@@ -1,0 +1,76 @@
+2017.11.1 Wednesday
+e3.6
+
+>
+
+Given as a starting point:
+(define rand
+  (let ((x random-init))
+    (lambda ()
+      (set! x (rand-update x))
+      x)))
+
+Sample implementation of rand-update I put together quickly with the thought of generating random numbers in the range [0,4294967087):
+(define (rand-update x)
+  (modulo (+ (* 2969 x) 4294967087) 4294967087))
+  
+The distribution looked decent just from running a basic test, varying the experiment and checking the result:
+(monte-carlo 100000000 (lambda () (< (rand) 1000)))
+  
+Defined a random-init in the "global environment":
+(define random-init 1093909230)
+
+>>
+
+(define rand 
+  (let ((x random-init))
+    (lambda (command)
+      (cond ((eq? 'generate command)
+             (set! x (rand-update x))
+             x)
+            ((eq? 'reset command)
+             (lambda (new-value)
+               (set! x new-value)
+               true))
+            (else (error "Unknown command -- RAND"
+                         command))))))
+                         
+>>>
+
+Results:
+> (rand 'generate)
+821386098
+> (rand 'generate)
+3448986633
+> (rand 'generate)
+839777969
+> (rand 'generate)
+2219879501
+> ((rand 'reset) random-init)
+#t
+> (rand 'generate)
+821386098
+> (rand 'generate)
+3448986633
+> (rand 'generate)
+839777969
+> (rand 'generate)
+2219879501
+
+>>>
+
+One of my failed implementations on the way to success is worth saving and reflecting on:
+
+(define (rand command)
+  (let ((x random-init))
+    (cond ((eq? 'generate command)
+           (set! x (rand-update x))
+           x)
+          ((eq? 'reset command)
+           (lambda (new-value)
+             (set! x new-value)
+             true))
+          (else (error "Unknown command -- RAND"
+                       command)))))
+                       
+This doesn't work because the procedure represented by rand is not inside an "environment" where x is defined.  I don't have a precise picture in my head of how this works, but it looks like it will be covered soon!

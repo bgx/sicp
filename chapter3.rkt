@@ -1,5 +1,5 @@
 #lang sicp
-(#%require (only racket provide time error))
+(#%require (only racket provide time error random))
 (#%require (rename racket racket-list list))
 ;(#%require (rename racket fold-left foldl))
 ;(#%require (rename racket fold-right foldr))
@@ -21,3 +21,4 @@
                   (f x))))))
 
 ;;;;;;;;;;;;;; Experimental Below ;;;;;;;;;;;;;;;;;;
+
