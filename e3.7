@@ -1,0 +1,31 @@
+2017.11.5 Sunday
+e3.7
+
+>
+
+I can think of two ways to do this:
+
+(1) make-joint return a procedure that, if used with the correct password, dispatches to the original account with the original account's password.  The returned procedure is like a wrapper of the original account, and the original account is not changed in any way.
+
+Benefits: The code of make-account does not have to be changed.
+Costs: 
+- The procedure returned by make-joint will not work if the password of the original account is changed -- it will need to be updated to use the new password of the original account.
+- The original access to the account can not see who has access to the account without tracing who is accessing the account.
+- All accessors will have the same level of access, since everyone will be accessing the account through the same path.
+
+(2) Change make-account to have a new message that will add a password to the account.  the original password can be kept separately from the list of added passwords, so that only the original access to the account can do certain things. or all of the passwords can be collected into one list.  or there can be a list of passwords that give privileged access and a list that do not.
+
+Benefits:
+- The new access given to the account will not be lost if the original access changes its password.
+- Can set privilege levels for different accessors of the account.
+Costs: The code of make-account will need to be changed.
+
+>>
+
+Implementation of (1):
+
+(define (make-joint account original-password new-password)
+  (lambda (pass msg)
+    (if (eq? new-password pass)
+        (account original-password msg)
+        (lambda (amount) "Incorrect password"))))

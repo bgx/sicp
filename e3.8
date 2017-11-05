@@ -1,0 +1,28 @@
+2017.11.5 Sunday
+e3.8
+
+>>
+
+There are many ways to do this -- here are two that I like, in the order I came up with them:
+
+>>
+
+(define f
+  (let ((state 0))
+    (lambda (x)
+      (let ((r state))
+        (set! state x)
+        (if (< x r) 1 0)))))
+
+This returns 0 if the input is greater than or equal to the previous input, and returns 1 if the input is less than the previous input.
+
+>>
+
+(define f
+  (let ((state 0))
+    (lambda (x)
+      (let ((r state))
+        (set! state x)
+        r))))
+
+This returns the input from the previous call of the procedure -- it's like a one procedure call delay.
