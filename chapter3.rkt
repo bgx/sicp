@@ -20,5 +20,12 @@
             (else (set! count (+ count 1))
                   (f x))))))
 
+; 3.3.1
+
+(define (last-pair x)
+  (if (null? (cdr x))
+      x
+      (last-pair (cdr x))))
+
 ;;;;;;;;;;;;;; Experimental Below ;;;;;;;;;;;;;;;;;;
 

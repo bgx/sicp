@@ -1,0 +1,45 @@
+2017.11.11 Saturday
+e3.14
+
+>
+
+(define (mystery x)
+  (define (loop x y)
+    (if (null? x)
+        y
+        (let ((temp (cdr x)))
+          (set-cdr! x y)
+          (loop temp x))))
+  (loop x '()))
+  
+Explain what mystery does in general. Suppose v is defined by (define v (list 'a 'b 'c 'd)). Draw the box-and-pointer diagram that represents the list to which v is bound. Suppose that we now evaluate (define w (mystery v)). Draw box-and-pointer diagrams that show the structures v and w after evaluating this expression. What would be printed as the values of v and w ?
+
+>>
+
+(mystery x) modifies the input list to reverse the items in the list, and returns the reverse-ordered list.
+
+(define v (list 'a 'b 'c 'd))
+
+v -->[ . | .-]-->[ . | .-]-->[ . | .-]-->[ . | / ]
+       |           |           |           |
+       V           V           V           V
+     [ a ]       [ b ]       [ c ]       [ d ]
+     
+
+
+(define w (mystery v))
+
+                                       v-+
+                                         |
+                                         V
+w -->[ . | .-]-->[ . | .-]-->[ . | .-]-->[ . | / ]
+       |           |           |           |
+       V           V           V           V
+     [ d ]       [ c ]       [ b ]       [ a ]
+
+
+> v
+(a)
+
+> w
+(d c b a)

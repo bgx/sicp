@@ -1,0 +1,92 @@
+2017.11.11 Saturday
+e3.15
+
+>
+
+(define (set-to-wow! x)
+  (set-car! (car x) 'wow)
+  x)
+  
+z1 -->[ . | . ]
+        |   |
+        V   V
+x  -->[ . | .-]-->[ . | / ]
+        |           |
+        V           V
+      [ a ]       [ b ]
+
+      
+z2 -->[ . | .-]-->[ . | .-]-->[ . | / ]
+        |           |           |
+        |           V           V
+        |         [ a ]       [ b ]
+        |           ^           ^
+        |           |           |
+        +-------->[ . | .-]-->[ . | / ]
+
+>>
+
+(set-to-wow! z1)
+
+(car z1) is:
+
+[ . | .-]-->[ . | / ]
+  |           |
+  V           V
+[ a ]       [ b ]
+
+And we set the car of this to 'wow, to get:
+
+ [ . | .-]-->[ . | / ]
+   |           |
+   V           V
+[ wow ]      [ b ]
+
+And z1 is now:
+
+z1 -->[ . | . ]
+        |   |
+        V   V
+x  -->[ . | .-]-->[ . | / ]
+        |           |
+        V           V
+     [ wow ]      [ b ]
+     
+Thus:
+> z1
+((wow b) wow b)
+
+>>
+
+(set-to-wow! z2)
+
+(car z2) is:
+
+[ . | .-]-->[ . | / ]
+  |           |
+  V           V
+[ a ]       [ b ]
+
+And we set the car of this to 'wow, to get:
+
+ [ . | .-]-->[ . | / ]
+   |           |
+   V           V
+[ wow ]      [ b ]
+
+And z2 is now:
+
+z2 -->[ . | .-]-->[ . | .-]-->[ . | / ]
+        |           |           |
+        |           V           V
+        |         [ a ]       [ b ]
+        |                       ^
+        |                       |
+        +-------->[ . | .-]-->[ . | / ]
+                    |
+                    V
+                 [ wow ]
+     
+Thus:
+> z2
+((wow b) a b)
