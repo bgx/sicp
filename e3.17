@@ -1,0 +1,69 @@
+2017.11.12 Sunday
+e3.17
+
+>>
+
+; First solution making use of append! (which doesn't work if its first argument is null)
+
+(define (count-pairs x)
+  ;; counted is an unordered list of pairs
+  (define counted (list x))
+  (define (counted? x)
+    (memq x counted))
+  (define (add-to-counted x)
+    (append! counted (list x)))
+  (define (f x)
+    (cond ((not (pair? x)) 0)
+          ((counted? x) 0)
+          (else (add-to-counted x)
+                (g x))))
+  (define (g x)
+    (+ (f (car x))
+       (f (cdr x))
+       1))
+  (g x))
+  
+; Second attempt making use of just set!
+
+(define (count-pairs-b x)
+  ;; counted is an unordered list of pairs
+  (define counted '())
+  (define (counted? x)
+    (memq x counted))
+  (define (add-to-counted x)
+    (set! counted (cons x counted)))
+  (define (f x)
+    (cond ((not (pair? x)) 0)
+          ((counted? x) 0)
+          (else (add-to-counted x)
+                (+ (f (car x))
+                   (f (cdr x))
+                   1))))
+  (f x))
+  
+>>>
+
+(define z1 '(a b c))
+
+(define (create-z2)
+  (define v '(a b c))
+  (begin
+    (set-car! v (last-pair v))
+    v))
+(define z2 (create-z2))
+
+(define (create-z3)
+  (define v '(a b c))
+  (begin
+    (set-car! v (cdr v))
+    (set-car! (cdr v) (cdr (cdr v)))
+    v))
+(define z3 (create-z3))
+
+(define z4 (make-cycle '(a b c)))
+
+
+> (map count-pairs (list z1 z2 z3 z4))
+{3 3 3 3}
+> (map count-pairs-b (list z1 z2 z3 z4))
+{3 3 3 3}

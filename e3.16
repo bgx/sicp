@@ -1,0 +1,80 @@
+2017.11.12 Sunday
+e3.16
+
+>
+
+(define (count-pairs x)
+  (if (not (pair? x))
+      0
+      (+ (count-pairs (car x))
+         (count-pairs (cdr x))
+         1)))
+         
+>>
+
+(define z1 '(a b c))
+
+z1 -->[ . | .-]-->[ . | .-]-->[ . | / ]
+        |           |           |
+        V           V           V
+      [ a ]       [ b ]       [ c ]
+
+      
+(define (create-z2)
+  (define v '(a b c))
+  (begin
+    (set-car! v (last-pair v))
+    v))
+(define z2 (create-z2))
+
+        +-----------------------+
+        |                       |
+        |                       V
+z2 -->[ . | .-]-->[ . | .-]-->[ . | / ]
+                    |           |
+                    V           V
+                  [ b ]       [ c ]
+
+(define (create-z3)
+  (define v '(a b c))
+  (begin
+    (set-car! v (cdr v))
+    (set-car! (cdr v) (cdr (cdr v)))
+    v))
+(define z3 (create-z3))
+
+                    +-----------+
+                    |           |
+                    |           V
+z3 -->[ . | .-]-->[ . | .-]-->[ . | / ]
+        |           ^           |
+        |           |           V
+        +-----------+         [ c ]
+
+
+(define z4 (make-cycle '(a b c)))
+
+      z4
+      |
+      V
+ +--->[ . | .-]-->[ . | .-]-->[ . | .-]---+
+ |      |           |           |         |
+ |      V           V           V         |
+ |    [ a ]       [ b ]       [ c ]       |
+ |                                        |
+ |________________________________________|
+        
+>>
+
+> z1
+{a b c}
+> z2
+{{c} b c}
+> z3
+{{{c} c} {c} c}
+> z4
+#0={a b c . #0#}
+> (map count-pairs (list z1 z2 z3))
+{3 4 7}
+> (count-pairs z4)
+!!! <Endless loop, does not return> !!!
