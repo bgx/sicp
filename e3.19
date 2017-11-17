@@ -1,0 +1,82 @@
+2017.11.16 Thursday
+e3.19
+
+>>
+
+My first attempt was severely flawed:
+
+; for lists ("[would] a program that tried to find the end of the list by taking successive cdrs...go into an infinite loop[?]")
+(define (contains-cycle? x)
+  (define (f x test-pair)
+    (cond ((not (pair? x)) false)
+          ((eq? x test-pair) true)
+          (else (f (cdr x) test-pair))))
+  (define (g test-pair)
+    (cond ((null? test-pair) false)
+          ((f (cdr test-pair) test-pair) true)
+          (else (g (cdr test-pair)))))
+  (g x))
+  
+Fail case:
+(define z4 (make-cycle '(a b c)))
+(define z5 (cons 'aa z4))
+(contains-cycle? z5)
+
+This never returns, because the successive cdrs of f will enter a cycle that never finds a pair equal to the test-pair
+
+>>
+
+Second attempt after reading about cycle detection:
+
+; for lists ("[would] a program that tried to find the end of the list by taking successive cdrs...go into an infinite loop[?]")
+
+; This uses ideas from Brent's algorithm.
+; I think the key to understanding this algorithm is to realize the tortoise pointer is being moved up by powers of two to get inside the cycle quickly, while the hare pointer searches for a match to the tortoise to detect that they are both in fact inside the cycle.  See Brent's paper for the explanation of why we the tortoise pointer is moved up by powers of two, and not powers of some other number.
+(define (contains-cycle? x)
+  (define power 1)
+  (define lam 1)
+  (define tortoise x)
+  (define hare (cdr x))
+  (define (iter)
+    (cond ((null? hare) false)
+          ((eq? tortoise hare) true)
+          (else
+           (if (= power lam)
+              (begin
+                (set! tortoise hare)
+                (set! power (* 2 power))
+                (set! lam 0)))
+           (set! hare (cdr hare))
+           (set! lam (+ lam 1))
+           (iter))))
+  (iter))
+  
+>>>
+
+This algorithm uses a constant amount of space: power, lam, tortoise, and hare.
+  
+>>>
+
+(define z1 '(a b c))
+
+(define (create-z2)
+  (define v '(a b c))
+  (begin
+    (set-car! v (last-pair v))
+    v))
+(define z2 (create-z2))
+
+(define (create-z3)
+  (define v '(a b c))
+  (begin
+    (set-car! v (cdr v))
+    (set-car! (cdr v) (cdr (cdr v)))
+    v))
+(define z3 (create-z3))
+
+(define z4 (make-cycle '(a b c)))
+
+(define z5 (cons 'aa z4))
+
+> (map contains-cycle? (list z1 z2 z3 z4 z5))
+{#f #f #f #t #t}

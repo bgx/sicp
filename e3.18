@@ -1,0 +1,55 @@
+2017.11.16 Thursday
+e3.18
+
+>>
+
+; for list structures
+(define (contains-cycle? x)
+  (define (counted? x counted)
+    (memq x counted))
+  (define (f x counted)
+    (cond ((not (pair? x)) false)
+          ((counted? x counted) true)
+          (else (or (f (car x) (cons x counted))
+                    (f (cdr x) (cons x counted))))))
+  (f x '()))
+  
+>>
+
+; for lists ("[would] a program that tried to find the end of the list by taking successive cdrs [...] go into an infinite loop[?]")
+(define (contains-cycle?-b x)
+  (define (counted? x counted)
+    (memq x counted))
+  (define (f x counted)
+    (cond ((not (pair? x)) false)
+          ((counted? x counted) true)
+          (else (f (cdr x) (cons x counted)))))
+  (f x '()))
+  
+>>>
+
+(define z1 '(a b c))
+
+(define (create-z2)
+  (define v '(a b c))
+  (begin
+    (set-car! v (last-pair v))
+    v))
+(define z2 (create-z2))
+
+(define (create-z3)
+  (define v '(a b c))
+  (begin
+    (set-car! v (cdr v))
+    (set-car! (cdr v) (cdr (cdr v)))
+    v))
+(define z3 (create-z3))
+
+(define z4 (make-cycle '(a b c)))
+
+(define z5 (cons 'aa z4))
+
+> (map contains-cycle? (list z1 z2 z3 z4 z5))
+{#f #f #f #t #t}
+> (map contains-cycle?-b (list z1 z2 z3 z4))
+{#f #f #f #t #t}
