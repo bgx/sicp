@@ -1,0 +1,26 @@
+This following is a good description of the printing conventions of pairs and lists in Scheme
+___________________________________________________________________________________
+
+From 'The Racket Guide', Section 2.4, "Pairs, Lists, and Racket Syntax" (https://docs.racket-lang.org/guide/Pairs__Lists__and_Racket_Syntax.html):
+
+.
+.
+.
+
+The cons function actually accepts any two values, not just a list for the second argument. When the second argument is not empty and not itself produced by cons, the result prints in a special way. The two values joined with cons are printed between parentheses, but with a dot (i.e., a period surrounded by whitespace) in between:
+
+    > (cons 1 2)
+
+    '(1 . 2)
+
+.
+.
+.
+
+The only thing more confusing to new Racketeers than non-list pairs is the printing convention for pairs where the second element is a pair, but is not a list:
+
+    > (cons 0 (cons 1 2))
+
+    '(0 1 . 2)
+
+In general, the rule for printing a pair is as follows: use the dot notation unless the dot is immediately followed by an open parenthesis. In that case, remove the dot, the open parenthesis, and the matching close parenthesis. Thus, '(0 . (1 . 2)) becomes '(0 1 . 2), and '(1 . (2 . (3 . ()))) becomes '(1 2 3).
