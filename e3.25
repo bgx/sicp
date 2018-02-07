@@ -1,0 +1,63 @@
+2018.1.10 Wednesday
+e3.25
+
+!unfinished
+ - I got (lookup) working, but not (insert!).
+ 
+>>
+
+(define (make-table)
+  (let ((local-table (list '*table*)))
+    (define (lookup key-list)
+      (define (lookup-iter key-list table)
+        (if (not (pair? key-list))
+            (error "must have at least one value")
+            (let ((subtable (assoc (car key-list) (cdr table))))
+              (if (not subtable)
+                  false
+                  (if (null? (cdr key-list))
+                      (cdr subtable)
+                      (lookup-iter (cdr key-list) subtable))))))
+      (lookup-iter key-list local-table))
+    
+    (define (insert! key-1 key-2 value)
+      (let ((subtable (assoc key-1 (cdr local-table))))
+        (if subtable
+            (let ((record (assoc key-2 (cdr subtable))))
+              (if record
+                  (set-cdr! record value)
+                  (set-cdr! subtable
+                            (cons (cons key-2 value)
+                                  (cdr subtable)))))
+            (set-cdr! local-table
+                      (cons (list key-1
+                                  (cons key-2 value))
+                            (cdr local-table)))))
+      'ok)
+
+    (define (insert! key-list value)
+      (define (insert!-iter key-list table)
+        
+      (let ((subtable (assoc (car key-list) (cdr table))))
+        (if subtable
+            (let ((record (assoc key-2 (cdr subtable))))
+              (if record
+                  (set-cdr! record value)
+                  (set-cdr! subtable
+                            (cons (cons key-2 value)
+                                  (cdr subtable)))))
+            (set-cdr! table
+                      (cons (list key-1
+                                  (cons key-2 value))
+                            (cdr table)))))
+      'ok)
+    
+    (define (dispatch m)
+      (cond ((eq? m 'lookup-proc) lookup)
+            ((eq? m 'insert-proc!) insert!)
+            (else (error "Unknown operation -- TABLE" m))))
+    dispatch))
+
+(define operation-table (make-table))
+(define get (operation-table 'lookup-proc))
+(define put (operation-table 'insert-proc!))
