@@ -1,0 +1,17 @@
+2018.02.07 Wednesday
+e3.34
+
+>
+
+There is a serious flaw with building a squarer in this fashion:
+
+(define (squarer a b)
+  (multiplier a a b))
+  
+Explain.
+
+>>
+
+If there is no value on the 'b connector', then setting a value on the 'a connector' would in fact result in a value on the 'b connector' that is the value of the 'a connector' squared.
+
+However, say there is no value on the 'a connector' and a value is set on the 'b connector'.  The desired result is for a value of the square of the value of the 'b connector' to be set on the 'a connector'.  But in looking at the (process-new-value) definition inside (multiplier), we can see that for the condition of product (the 'b connector') having a value and neither m1 nor m2 having a value (both being the 'a connector' in this scenario), nothing happens.  It is not possible to place a value on the 'a connector' by setting a value on the 'b connector'.  The actual result does not equal the desired result.
