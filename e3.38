@@ -1,0 +1,40 @@
+2018.02.14 Wednesday
+e3.38
+
+>>
+
+(a)
+
+Peter : A
+Paul : B
+Mary : C
+
+ABC - 100 A 110 B 90 C 45
+ACB - 100 A 110 C 55 B 35
+BAC - 100 B 80 A 90 C 45
+BCA - 100 B 80 C 40 A 50
+CAB - 100 C 50 A 60 B 40
+CBA - 100 C 50 B 30 A 50
+
+Possible values: 50 45 40 35
+
+(b)
+
+Break each transaction down to (1) an access and (2) a set
+
+Peter: a b
+Paul : c d
+Mary : e f
+
+Any combination of a,b,c,d,e,f is possible, as long as a is before b, c is before d, and e is before f
+
+How many combinations are possible?
+
+6! * 1/2 (only a before b) * 1/2 (only c before d) * 1/2 (only e before f) = 6! * (1/8) = 6*5*3 = 90 combinations
+
+Let's take one of these as an example
+c,a,d,e,f,b
+
+100 c100 a100 d(c100 - 20) 80 e80 f(e80 * .5) 40 b(a100 + 10) 110
+
+So here we have an example where balance is 110 after all three transactions.  Peter's access a occurs before Paul's set d and Mary's set f, and Peter's set b occurs after both d and f.  The operation that is used to calculate the value for the set b uses the access a, and it is as if Paul and Mary's transactions never took place.
