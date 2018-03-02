@@ -1,0 +1,10 @@
+2018.03.02 Thursday
+e3.42
+
+>>
+
+This is a safe change to make -- there is no difference in what concurrency is allowed by these two versions of make-account.
+
+The serialized procedure for withdrawal or deposit returned to the consumer of the bank account will be the same (i.e. the same behavior in the same environment, as in regarding the environment model of evaluation) no matter if it is created once or if it is created each time it is returned.
+
+The key is that the same serializer is used to create each serialized procedure.  This serializer holds the state (specifically the mutex) that implements the serialization.

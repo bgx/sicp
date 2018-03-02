@@ -1,0 +1,59 @@
+2018.03.01 Thursday
+e3.40
+
+>
+
+Labelling the atomic steps of each process:
+
+P1
+x = x * x
+Access x, Access x, <Compute result>, Set x
+a_A a_B s_C
+A B C
+
+P2
+x = x * x * x
+Access x, Access x, Access x, <Compute result>, Set x
+a_D a_E a_F s_G
+D E F G
+
+>>
+
+*Possible without serialization*
+10^6
+A, B, and C execute; then D, E, F, and G execute.
+
+10^5
+A, B, and D execute; then C executes; then E, F, and G execute.
+
+10^4
+A, B, D, and E execute; then C executes; then F and G execute.
+
+10^3
+A, B, D, E, and F execute; then C executes; then G executes.
+
+10^6
+D, E, F, and G execute; then A, B, and C execute.
+
+10^4
+D, E, F, and A execute; then G executes; then B and C execute.
+
+10^2
+D, E, F, A, and B execute; then G executes; then C executes.
+
+>>
+
+*Possible with serialization*
+The steps of P1 and P2 can no longer interleave.  Thus:
+
+10^6
+
+(1)
+P1 sets x to 10^2; P2 sets x to 10^6.
+A, B, and C execute; then D, E, F, and G execute.
+
+OR
+
+(2)
+P2 sets x to 10^3; P1 sets x to 10^6.
+D, E, F, and G execute; then A, B, and C execute.

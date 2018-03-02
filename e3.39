@@ -1,0 +1,20 @@
+2018.03.01 Thursday
+e3.39
+
+>>
+
+*Possible*
+101:  P1 sets x to 100 and then P2 increments x to 101.
+121:  P2 increments x to 11 and then P1 sets x to x times x.
+-- These can both happen, as they can if both P1 and P2 are entirely wrapped by a serializer.
+
+100:  P1 accesses x (twice), then P2 sets x to 11, then P1 sets x.
+-- This can happen now because the assignment to x in P1 is not serialized.
+
+11:  P2 accesses x, then P1 sets x to 100, then P2 sets x.
+-- Say the serialized part of P1 executes first.  Then P2 begins executing.  Since the assignment to x in P1 is not serialized, it can happen at any time before, during, or after the execution of P2.  So P2 accesses x, then P1 sets x to 100, then P2 sets x.
+
+
+*Not possible*
+110:  P2 changes x from 10 to 11 between the two times that P1 accesses the value of x during the evaluation of (* x x).
+-- P2 and the evaluation of (* x x) by P1 are both serialized, so the execution of these can not interleaved.

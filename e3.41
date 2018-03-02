@@ -1,0 +1,22 @@
+2018.03.01 Thursday
+e3.41
+
+>
+
+From 3.4: "the execution of assignment statements (in this case, assignments to the variable balance) delineates moments in time when values change. The result of evaluating an expression depends not only on the expression itself, but also on whether the evaluation occurs before or after these moments."
+
+From 3.4.1: "A less stringent restriction on concurrency would ensure that a concurrent system produces the same result as if the processes had run sequentially in some order. There are two important aspects to this requirement. First, it does not require the processes to actually run sequentially, but only to produce results that are the same as if they had run sequentially. [...] Second, there may be more than one possible ``correct'' result produced by a concurrent program, because we require only that the result be the same as for some sequential order."
+
+From 3.4.2: "We can use serialization to control access to shared variables. For example, if we want to update a shared variable based on the previous value of that variable, we put the access to the previous value of the variable and the assignment of the new value to the variable in the same procedure. We then ensure that no other procedure that assigns to the variable can run concurrently with this procedure by serializing all of these procedures with the same serializer. This guarantees that the value of the variable cannot be changed between an access and the corresponding assignment."
+
+>>
+
+The procedures 'withdrawal' and 'deposit' as part of their execution set the shared state variable 'balance'.  These assignments delineate moments in time when 'balance' changes.  These procedures also access 'balance', so that they can use it to compute the result that will be assigned to 'balance'.
+
+We desire to meet the restriction on concurrency that the concurrent system produces the same result as if the processes had run sequentially in some order.  If 'withdrawal' and 'deposit' are run sequentially (either 'withdrawal' then 'deposit', or 'deposit' then 'withdrawal'), then it follows that all of the first procedure that executes will be in one "moment in time" and all of the second procedure that executes will be in another "moment in time".  So for each of these procedures, we can't have the access of 'balance' in a separate "moment in time" from the set of 'balance'.
+
+Accessing the 'balance' of the bank account does not include an assignment, and so has no ability to delineate moments in time.  An access to the 'balance' can happen in the "moment in time" before a specific assignment, or in the "moment in time" after a specific assignment.  These are both possible scenarios when running sequentially.
+
+We meet the restriction on concurrency mentioned above without serializing access to the 'balance' of the bank account -- there is no incorrect or anomalous behavior regarding this restriction on concurrency.  Serializing this access does not matter in this regard.
+
+There may be behavior that is considered anomalous by Ben, but it would not be considered anomalous in regards to a valid concurrent system operating under the restriction set forth above.

@@ -1,0 +1,16 @@
+2018.03.02 Thursday
+e3.44
+
+>>
+
+In 'exchange', 'difference' (the amount that is withdrawn from one account and deposited into another) can be computed based on state in one "moment in time" and then can be used in another "moment in time", when said state has been assigned a new value.  It's the same situation that lead us to serialize 'withdrawal' and 'deposit'.
+
+The essential difference with 'transfer' is that 'amount' (the amount that is withdrawn from one account and deposited into another) does not have to be based on state that can change between 'withdrawal' and 'deposit'.
+
+Say it is -- then we essentially have the same problem as with 'exchange'.  But it's not up to 'transfer' to deal with that problem -- it's up to the consumer of 'transer', who is giving it an 'amount' that is based on state that can change between 'withdrawal' and 'deposit', to wrap the acquisition of that state and the call to 'transfer' in a serializer (similarly to what is done in 'serialized-exchange'.
+
+Say it is not -- then we need to examine what we are assuming when the authors say "You should assume that the balance in from-account is at least amount."
+
+Does this mean that we can assume that at the time of the call to 'withdrawal' inside 'transfer', the balance in from-account is at least amount?  Then we can say we will not see any strange behavior.  Multiple concurrent calls to 'transfer' will turn out a result that could be achieved by some order of these 'transfer' calls being run sequentially (even in the extreme where all the 'withdrawal' operations are run first before all the remaining 'deposit' operations are run).
+
+Or does this mean that we can assume that at the time of the call to *'transfer', the balance in from-account is at least amount?  Then it is possible that the balance of from-account will change in between the entrance to 'transfer' and the entrance to the 'withdrawal' call inside 'transfer' meaning we could attempt to withdraw an 'amount' that is larger than the balance in from-account.  This would be hugely problematic because the non-withdrawal would not stop the subsequent deposit from running.  This cannot be fixed with serialization only -- we would need a combo of input validation and serialization, or a way to not deposit if withdrawal failed, or something else I can't think of off the top of my head.
