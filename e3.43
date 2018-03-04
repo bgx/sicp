@@ -1,0 +1,63 @@
+2018.03.02 Thursday
+e3.44
+
+>>
+
+Say there are three accounts -- one with $10, one with $20, one with $30.
+
+There are three different combinations of two accounts exchanging money in one atomic operation (i.e. a single exchange):
+1) $10 for $20 -- 10,20,30 becomes 20,10,30
+2) $10 for $30 -- 10,20,30 becomes 30,20,10
+3) $20 for $30 -- 10,20,30 becomes 10,30,20
+
+After each of these three possible ways to perform a single exchange, there will still be three accounts -- one with $10, one with $20, one with $30.
+
+Now assume after n exchanges we have three accounts -- with $10, $20, $30, in some order.  Doing one more exchange will still leave three accounts -- with $10, $20, $30, in some order.
+
+Thus, for one or more exchanges, if we start with $10, $20, $30 in some order, we are left with $10, $20, $30 in some order.
+
+>>
+
+Now we're going to examine a version of the exchange operation that is not performed in one atomic operation.
+
+The steps of each exchange operation are:
+- Access balance from-account
+- Access balance to-account
+- Calculate difference between from-account and to-account
+- Withdraw difference from from-account
+- Deposit different to to-account
+
+     (exchange B A)        (exchange B C)
+--------------------------------------------------
+<Initial>
+A 10                 B 30                    C 20
+
+      Calc diff: 20
+                            Calc diff: 10
+--------------------------------------------------
+    <withdraw 20 from B>
+A 10                 B 10                    C 20
+--------------------------------------------------
+    <deposit 20 to A>
+A 30                 B 10                    C 20
+--------------------------------------------------
+                           <withdraw 10 from B>
+A 30                 B 0                     C 20
+--------------------------------------------------
+                           <deposit 10 to C>
+A 30                 B 0                     C 30
+
+>>
+
+Even if the difference is not what it should be, the exchange operation is written so that it is guaranteed to withdraw the difference from one account and deposit the same difference in another account.  So money is conserved within the system.
+
+>>
+
+If we did no serialize the transactions on individual accounts, we have the same problem that we solved with serializers in the first place earlier in the chapter.
+
+This condition can be violated if the difference calculated inside an execution of account-exchange (dependent on some balance) falls in one "moment in time" for that balance, another execution of account-exchange changes said balance to start another "moment in time", and then the first execution of account-exchange uses the 'out-dated' difference.
+
+ 
+In 'exchange', 'difference' (the amount that is withdrawn from one account and deposited into another) can be computed based on state in one "moment in time" and then can be used in another "moment in time", when said state has been assigned a new value.  It's the same situation that lead us to serialize 'withdrawal' and 'deposit'.
+
+The essential difference with 'transfer' is that 'amount' (the amount that is withdrawn from one account and deposited into another) does not have to be based on state that can change between 'withdrawal' and 'deposit'.
