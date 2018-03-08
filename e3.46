@@ -1,0 +1,10 @@
+2018.03.06 Tuesday
+e3.46
+
+>>
+
+Not going to draw a timing diagram for this one, I'll just explain concisely.
+
+Two processes call (mutex 'acquire) with the same mutex.  The two processes execute 'the-mutex' function of (make-mutex), and the two processes call (test-and-set! cell) concurrently.
+
+With test-and-set! implemented as an ordinary procedure, the two processes can execute parts of test-and-set! in an interleaved fashion.  Both can check (car cell) and see that it is false before either one of them calls (set-car! cell true).  So then they both end up calling (set-car! cell true) and they both return false, which means they are both let into a mutual exclusion area of execution, which violates the desired behavior of the mutex.
