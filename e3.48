@@ -1,0 +1,36 @@
+2018.03.08 Thursday
+e3.48
+
+>>
+
+Peter attempts to exchange a1 with a2 while Paul concurrently attempts to exchange a2 with a1.  Say we use the deadlock avoidance method of numbering the accounts with an id and having each process attempt to acquire the smaller-numbered account first.  Either a1 or a2 is the account with the smaller-numbered id -- we'll call this aSmall, while the larger-numbered account will be aLarge.  With the deadlock avoidance method, both exchange processes will attempt to enter a serialized procedure protected aSmall.  Once one process enters this serialized procedure, the other process will wait to acquire the serializer of aSmall, instead of acquiring the serializer of aLarge and possibly leading to a deadlock.
+
+>>
+
+(define (make-account-and-serializer balance)
+   (define (withdraw amount)
+     (if (>= balance amount)
+         (begin (set! balance (- balance amount))
+                balance)
+         "Insufficient funds"))
+   (define (deposit amount)
+     (set! balance (+ balance amount))
+     balance)
+   (let ((balance-serializer (make-serializer))
+         (account-id (random 4294967087)))
+     (define (dispatch m)
+       (cond ((eq? m 'withdraw) withdraw)
+             ((eq? m 'deposit) deposit)
+             ((eq? m 'balance) balance)
+             ((eq? m 'serializer) balance-serializer)
+             ((eq? m 'id) account-id)
+             (else (error "Unknown request -- MAKE-ACCOUNT"
+                          m))))
+     dispatch))
+
+(define (serialized-exchange account1 account2)
+   (let ((serializer1 (account1 'serializer))
+         (serializer2 (account2 'serializer)))
+     (if (< (account1 'id) (account2 'id))
+         ((serializer1 (serializer2 exchange)) account1 account2)
+         ((serializer2 (serializer1 exchange)) account1 account2))))

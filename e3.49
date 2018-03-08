@@ -1,0 +1,8 @@
+2018.03.08 Thursday
+e3.49
+
+>>
+
+Say a process p1 accesses a shared resource r1, and while it is using the resource r1 it finds out it needs to acquire the shared resource r2.  Concurrently, a process p2 accesses r2, and while using r2 finds out that it needs to acquire r1.  
+
+The deadlock-avoidance method we have been working with, where we identify a shared resource with a unique number and then have processes attempt to acquire the smallest-numbered resource first, cannot be used in this situation.  A process cannot know both identifiers of the two shared resources it needs to acquire until it acquires one, and its entirely possible that the second acquired resource is smaller-numbered than the first acquired resource, which is a violation of our deadlock-avoidance method.  It's not possible for a process to acquire the needed shared resources in a particular order if the process does not know all of the shared resources it will need before it attempts to acquire one of those resources.
