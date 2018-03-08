@@ -1,0 +1,11 @@
+2018.03.05 Monday
+e3.45
+
+>>
+
+A consumer of a make-account-and-serializer 'object' can acquire an account's serializer and serialize a function that calls one of the now serialized withdraw and deposit functions of the account.  A serialized withdraw/deposit function will be waiting to acquire the mutex for the account while inside a function that holds the mutex for the account and won't give it up until it returns.  And so we have a deadlock.
+
+In a concrete example: serialized-exchange will be stuck waiting to acquire the mutex for one of the accounts.  
+
+serialized-exchange will acquire the serializer for each of the two accounts and use those serializers to serialize exchange.  Within exchange, withdraw will be called for one of the accounts.  Since withdraw is now serialized, withdraw will attempt to acquire the mutex for the account, but at this point serialized-exchange cannot give up the mutex, since it is still using it.  So execution will be stuck (deadlock).
+
