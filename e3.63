@@ -1,0 +1,40 @@
+2018.03.19 Monday
+e3.63
+
+>>
+
+With local variable guesses:
+
+guesses        1.0  1.5  1.4166
+-----------------------------------------------------------------------------
+[sqrt-improve]
+guesses             1.0  1.5     1.4166
+
+the output stream is accessing itself to get the previous value that can be used to calculate an improved guesses
+
+>>
+
+Without local variable guesses:
+
+sqrt-stream    1.0  1.5  1.4166  1.4142
+-----------------------------------------------------------------------------
+[sqrt-improve]
+sqrt-stream         1.0  1.5     1.4166
+-----------------------------------------------------------------------------
+[sqrt-improve]
+sqrt-stream              1.0     1.5
+-----------------------------------------------------------------------------
+[sqrt-improve]
+sqrt-stream                      1.0
+
+calculating the second value of the output stream creates another sqrt-stream stream that will feed a value to sqrt-improve to generate an improved guess. calculating the third value of the output stream will access the second value of the first created stream, which will create another sqrt-stream stream.  So for each advancement of the output stream, (a) a new stream will be created, and (b) every single previously calculated element of the stream will be calculated again.
+
+>>
+
+Without the optimization provided by memo-proc:
+
+The version using the local variable guesses would still be operating on a single guesses stream, but for each advancement of the stream, the previous value would need to be retrieved and, since it would no longer be stored, re-calculated.  And so for each advancement, every single previously calculated element of the stream would be calculated again.
+
+The version without the local variable guesses would not be affected.
+
+So the two versions would not differ in efficiency without the memo-proc optimization.

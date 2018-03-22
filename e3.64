@@ -1,0 +1,11 @@
+2018.03.19 Monday
+e3.64
+
+>>
+
+(define (stream-limit s tolerance)
+  (define (stream-limit-iter s prev)
+    (if (< (abs (- prev (stream-car s))) tolerance)
+        (stream-car s)
+        (stream-limit-iter (stream-cdr s) (stream-car s))))
+  (stream-limit-iter (stream-cdr s) (stream-car s)))
