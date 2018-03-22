@@ -1,0 +1,48 @@
+2018.03.11 Sunday
+e3.54
+
+>>
+
+(define (mul-streams s1 s2)
+  (stream-map * s1 s2))
+
+>>
+
+(define factorials (cons-stream 1 (mul-streams factorials (stream-cdr integers))))
+
+factorials is 1 and the promise to evaluate factorials multiplied with (2 3 4 ...)
+
+In simplified notation:
+
+(cdr ints)
+(cdr (ints-from-1))
+(cdr (1 (ints-from-2)))
+ints-from-2
+2 ints-from-3
+
+f
+1 (* f (cdr ints))
+1 (* f (cdr (ints-from-1)))
+1 (* f (cdr (1 (ints-from-2))))
+1 (* f ints-from-2)
+1 (* (1 (* f ints-from-2)) ints-from-2)
+1 (* (1 (* f ints-from-2)) (2 ints-from-3))
+1 (* 1 2) (* (* f ints-from-2) ints-from-3)
+1 2 (* (* f ints-from-2) ints-from-3)
+1 2 (* (* (1 (* f ints-from-2)) ints-from-2) ints-from-3)
+1 2 (* (* (1 (* f ints-from-2)) (2 ints-from-3)) ints-from-3)
+1 2 (* ((* 1 2) (* (* f ints-from-2) ints-from-3)) ints-from-3)
+1 2 (* (2 (* (* f ints-from-2) ints-from-3)) ints-from-3)
+1 2 (* (2 (* (* f ints-from-2) ints-from-3)) (3 ints-from-4))
+1 2 (* 2 3) (* (* (* f ints-from-2) ints-from-3) ints-from-4)
+1 2 6 (* (* (* f ints-from-2) ints-from-3) ints-from-4)
+etc.
+1 2 6 24 120 720 ...
+
+>>>
+Perhaps an easier way to visualize this and think about it is to make a table like on page 329:
+
+    1 2  6  24 120  ...
+*   2 3  4   5   6  ...
+-----------------------------------------------------
+  1 2 6 24 120 720  ...

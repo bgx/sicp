@@ -1,0 +1,21 @@
+2018.03.11 Sunday
+e3.55
+
+>>
+
+        S0    S0+S1    S0+S1+S2  ...
++       S1       S2          S3  ...
+-----------------------------------------------------
+  S0 S0+S1 S0+S1+S2 S0+S1+S2+S3  ...
+
+
+>>
+WRONG ATTEMPT #1
+(define (partial-sums S)
+  (add-streams (partial-sums S) (stream-cdr S)))
+
+>>
+CORRECT
+(define (partial-sums S)
+  (cons-stream (stream-car S)
+               (add-streams (partial-sums S) (stream-cdr S)))

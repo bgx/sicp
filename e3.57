@@ -1,0 +1,45 @@
+2018.03.19 Monday
+e3.57
+
+>
+
+I will make reference to Figure 1.5 "The tree-recursive process generated in computing (fib 5)"
+
+>>
+
+The first two values of fibs are 0 and 1 and do not require any additions to access.  The next value of fibs is calculated
+with one addition operation to add the previous two values 0 and 1.
+
+>>
+
+With the optimization provided by memo-proc, the third value of the fibs stream will be available for access with no re-calculation needed.  Any value of the fibs stream that has been accessed can be accessed again without re-calculation.  The remaining values of the stream are obtained by accessing the previous two values and adding them.  Each value of the stream after and including the third value requires one addition.  So we can say calculating the nth Fibonacci number in this case requires (n-1) addition operations.
+
+Looking at Figure 1.5, this is as if each time a 'fib x' was calculated, it only appeared again in the tree as its 'fib x' calculated value, and did not appear with a duplicate of the entire tree structure that was first used to calculate 'fib x'.
+
+>>
+
+Without the optimization provided by memo-proc, the third value of the fibs stream will need to be re-calculated each time it is accessed.  This is the case for all values of the fibs stream.  So when a value of the stream is accessed, the previous two values need to be re-calculated, and then those values must be added together to get the desired stream value.
+
+This is just like Figure 1.5 -- each time a 'fib x' is needed, the entire tree structure needed to calculated 'fib x' appears in its entirety.
+
+There are two intuitive ways to describe the addition operations needed to calculate the nth Fibonacci number in this manner:
+
+(a)
+
+Each additional leaf after the first included in the entire tree used to calculate Fib(n) will result in one addition operation to include it in the calculation of Fib(n).  And we know that the number of leaves in a tree calculating Fib(n) is precisely Fib(n+1).
+
+So the number of addition operations needed to calculate the nth Fibonacci number is:
+# leaves in Fib(n) tree - 1
+Fib(n+1) - 1
+
+And so the number of addition operations needed to calculate successive values of the fibs stream grows as fast as the values of the stream itself.
+
+(b)
+
+Each calculation of Fib(n) requires the number of additions required to calculate Fib(n-2) and Fib(n-1), plus one more addition operation to add them together.
+
+so if ops(n) == # of addition operations required to calculate Fib(n), then
+
+ops(0) = 0
+ops(1) = 0
+ops(n) = ops(n-2) + ops(n-1) + 1

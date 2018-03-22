@@ -1,0 +1,16 @@
+2018.03.19 Monday
+e3.58
+
+>>
+
+expand performs long division of num divided by den in a base defined by radix, and returns a stream containing the digits of the result after the floating point.
+
+In other words, num and den are the numerator and denominator of a rational number, each defined in some base b.  radix is some base defined in base b.  The output stream is the result of the division of num divided by den, expanded to the digits after the floating point in base radix.
+
+>>
+
+(expand 1 7 10)
+> 1 4 2 8 5 7 .......
+
+(expand 3 8 10)
+> 3 7 5 0 0 0 .......

@@ -1,0 +1,29 @@
+2018.03.19 Monday
+e3.60
+
+>>
+
+(define (mul-series s1 s2)
+  (cons-stream (* (stream-car s1) (stream-car s2))
+               (add-streams (add-streams (scale-stream (stream-cdr s1) (stream-car s2))
+                                         (scale-stream (stream-cdr s2) (stream-car s1)))
+                            (cons-stream 0 (mul-series (stream-cdr s1) (stream-cdr s2))))))
+                            
+>>>
+
+Put this together by writing down:
+
+a0 + a1x + a2x2 + a3x3 + a4x4 + ...
+
+b0 + b1x + b2x2 + b3x3 + b4x4 + ...
+
+(a0b0) + (a0b1 + a1b0)x + (a1b1 + a0b2 + a2b0)x2 + ...
+
+and figuring out how to piece the two streams together to get the needed result.
+
+>>>
+
+Testing
+
+(display-stream-to (add-streams (mul-series sine-series sine-series) (mul-series cosine-series cosine-series)) 16)
+> 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 done

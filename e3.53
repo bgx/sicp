@@ -1,0 +1,28 @@
+2018.03.10 Saturday
+e3.53
+
+>>
+s is 1 and the promise to evaluate s plus s
+
+In simplified notation:
+s
+1 (+ s s)
+1 (+ (1 (+ s s)) (1 (+ s s)))
+1 ((+ 1 1) (+ (+ s s) (+ s s)))
+1 2 (+ (+ s s) (+ s s))
+1 2 (+ ((+ 1 1) (+ (+ s s) (+ s s))) ((+ 1 1) (+ (+ s s) (+ s s))))
+1 2 (+ (2 (+ (+ s s) (+ s s))) (2 (+ (+ s s) (+ s s))))
+1 2 ((+ 2 2) (+ (+ (+ s s) (+ s s)) (+ (+ s s) (+ s s))))
+1 2 4 (+ (+ (+ s s) (+ s s)) (+ (+ s s) (+ s s)))
+etc.
+
+Thus,
+1 2 4 8 16 32 64 128 256 ...
+
+>>>
+Perhaps an easier way to visualize this and think about it is to make a table like on page 329:
+
+    1 2 4  8 16 ...
++   1 2 4  8 16 ...
+-----------------------------------------------------
+  1 2 4 8 16 32 ...

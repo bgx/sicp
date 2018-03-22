@@ -1,0 +1,11 @@
+2018.03.19 Monday
+e3.61
+
+>>
+
+(define (invert-unit-series s)
+  (if (not (= (stream-car s) 1))
+      (error "Constant term of input stream must be 1 -- INVERT-UNIT-SERIES" (stream-car s))
+      (cons-stream 1
+                   (mul-series (scale-stream (stream-cdr s) -1)
+                               (invert-unit-series s)))))

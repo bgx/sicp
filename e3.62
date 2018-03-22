@@ -1,0 +1,14 @@
+2018.03.19 Monday
+e3.62
+
+>>
+
+(define (div-series s1 s2)
+  (if (= (stream-car s2) 0)
+      (error "Denominator series has a zero constant term -- DIV-SERIES" (stream-car s2))
+      (mul-series s1
+                  (scale-stream (invert-unit-series (scale-stream s2
+                                                                  (/ 1 (stream-car s2))))
+                                (stream-car s2)))))
+
+(define tan-series (div-series sine-series cosine-series))
