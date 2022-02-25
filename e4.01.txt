@@ -1,0 +1,26 @@
+2022.02.25 Friday
+e4.01
+
+>>
+
+Assume (first-operand exps) extracts the left-most operand from the expression.
+
+Then the following will evaluate operands from left to right:
+
+(define (list-of-values exps env)
+  (if (no-operands? exps)
+      '()
+      (let ((left-operand (eval (first-operand exps) env)))
+        (cons left-operand
+              (list-of-values (rest-operands exps) env)))))
+
+The left operand is evaluated first with use of 'let' -- the value of 'left-operand' is computed outside the 'let', and then is used inside the body of the 'let'.
+
+And the following will evaluate operands from right to left:
+
+(define (list-of-values exps env)
+  (if (no-operands? exps)
+      '()
+      (let ((right-operand (list-of-values (rest-operands exps) env)))
+        (cons (eval (first-operand exps) env)
+              right-operand))))
