@@ -1,0 +1,24 @@
+2022.02.28 Monday
+e4.02
+
+>>
+
+(a)
+
+(application? exp) returns true for any compound expression, with the intention of returning true for any compound expression that is not one of the other expression types.  If the clause for procedure applications appears before the clause for assignments, then all assignments will be evaluated as procedure applications.
+
+For example, when evaluating "(define x 3)", the evaluator will be trying to evaluate "define" as a procedure with operands "x" and "3", and will look up the value of "x".  It's readily apparent that it's wrong to be looking up the value of "x" while evaluating an expression that is supposed to be defining the value of "x".
+
+>>
+
+(b)
+
+I think all that is needed is to update these three functions:
+
+(define (application? exp) (tagged-list? exp 'call))
+(define (operator exp) (cadr exp))
+(define (operands exp) (cddr exp))
+
+>>>
+
+We can not test that (b) is correct until after evaluator is working, which happens sometime after 4.1.2
