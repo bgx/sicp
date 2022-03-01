@@ -1,0 +1,35 @@
+2022.02.28 Monday
+e4.04
+
+>>
+
+Example usage:
+((and? exp)
+  (eval-and (subexpressions exp) env))
+((or? exp)
+  (eval-or (subexpressions exp) env))
+
+(define (subexpressions exp) (cdr exp))
+
+>>
+
+As special forms --
+
+(define (eval-and exps env)
+  (cond ((null? exps) 'true)
+        ((last-exp? exps) (eval (first-exp exps) env))
+        ((true? (eval (first-exp exps) env))
+         (eval-and (rest-exps exps) env))
+        (else 'false)))
+
+(define (eval-or exps env)
+  (cond ((null? exps) 'false)
+        (let (first-exp-value (eval (first-exp exps) env))
+          (if (true? first-exp-value)
+              first-exp-value
+              (eval-or (rest-exps exps) env)))))
+
+>>
+
+As derived expressions --
+
