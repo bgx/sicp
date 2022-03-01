@@ -1,0 +1,41 @@
+2022.02.28 Monday
+e4.03
+
+Rewrite eval so that the dispatch is done in data-directed style
+
+>>
+
+(define (eval exp env)
+  (cond ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        (else (let ((eval-function (get 'eval (expression-type exp))))
+                (cond (eval-function (eval-function exp env))
+                      ((application? exp)
+                        (apply (eval (operator exp) env)
+                               (list-of-values (operands exp) env)))
+                      (else
+                       (error "Unknown expression type -- EVAL" exp)))))))
+
+(define (expression-type exp) (car exp))
+
+(define (install-eval-package)
+  ;internal procedures
+  (define (eval-quote exp env)
+    (text-of-quotation exp))
+  (define (eval-lambda exp env)
+    (make-procedure (lambda-parameters exp)
+                    (lambda-body exp)
+                    env))
+  (define (eval-begin exp env)
+    (eval-sequence (begin-actions exp) env))
+  (define (eval-cond exp env)
+    (eval (cond->if exp) env))
+  ;interface to the rest of the system
+  (put 'eval 'quote eval-quote)
+  (put 'eval 'set! eval-assignment)
+  (put 'eval 'define eval-definition)
+  (put 'eval 'if eval-if)
+  (put 'eval 'lambda eval-lambda)
+  (put 'eval 'begin eval-begin)
+  (put 'eval 'cond eval-cond)
+  'ok)
