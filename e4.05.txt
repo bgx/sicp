@@ -1,0 +1,51 @@
+2022.02.28 Monday
+e4.05
+
+>>
+
+(define (cond-arrow-clause? clause)
+  (eq? (cadr clause) '=>))
+
+(define (cond-arrow-test clause)
+  (car clause))
+
+(define (cond-arrow-recipient clause)
+  (caddr clause))
+
+>>
+
+If there is no requirement that <test> be evaluated only once, and we assume that repeated evaluations of <test> will yield the same result, then this extended syntax can be supported like so:
+
+(define (expand-clauses clauses)
+  (if (null? clauses)
+      'false ; no else clause
+      (let ((first (car clauses))
+            (rest (cdr clauses)))
+        (if (cond-else-clause? first)
+            (if (null? rest)
+                (sequence->exp (cond-actions first))
+                (error "ELSE clause isn't last -- COND->IF"
+                       clauses))
+            ; vvv new vvv
+            (if (cond-arrow-clause? first)
+                (let ((test (cond-arrow-test first))
+                      (recipient (cond-arrow-recipient first)))
+                  (make-if test
+                           (list recipient test)
+                           (expand-clauses rest)))
+            ; ^^^ new ^^^
+                (make-if (cond-predicate first)
+                         (sequence->exp (cond-actions first))
+                         (expand-clauses rest)))))))
+
+The if expression created by the new make-if will copy the test expression into it twice -- it will be evaluated once to see if it's a true value, and it will be evaluated again to provide a value to recipient.
+
+>>
+
+To evaluate <test> only once, we would introduce a lambda/let that evaluates <test> and stores it in a variable.  However, there may be a problem with fitting this into the way we've handled cond as a derived expression.  Notice that `expand-clauses` doesn't evaluate any of the subexpressions that are being rewritten into nested if expressions.  If we introduce a variable (holding the value of <test>) that is present when these subexpressions are evaluated later, it may be that any expression that acts on a variable of the same name will be evaluated with the value of <test>, which we can reason would never be the intention of the author of the code being evaluated.
+
+I may be missing something with environments that makes this not a problem.
+
+>>
+
+<test> could be evaluated only once if we handled cond as another special form instead of a derived expression 
