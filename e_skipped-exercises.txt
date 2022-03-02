@@ -83,3 +83,6 @@ e4.08
 e4.09
 e4.10
 - I'm sick of not being able to test these easily because our evaluator is not completed yet.  I also think I got a good amount of insight into what is needed for 4.06-4.10 from 4.01-4.05.
+
+e4.11
+e4.13
