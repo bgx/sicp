@@ -1,0 +1,58 @@
+2022.03.03 Thursday
+e4.14
+
+>
+
+(define (map proc items)
+  (if (null? items)
+      '()
+      (cons (proc (car items))
+            (map proc (cdr items)))))
+
+(define (inc x)
+  (+ x 1))
+
+(define a '(1.2 3.4 5.6))
+
+; Using map on a primitive procedure
+(map round a)
+
+; Using map on a compound procedure
+(map inc a)
+
+>>
+
+Our evaluator stores procedures in data structures that the evaluator manipulates internally.
+
+Recall:
+
+(define (primitive-procedure-objects)
+  (map (lambda (proc) (list 'primitive (cadr proc)))
+       primitive-procedures))
+
+Primitive procedures are stored in a list: (primitive #<procedure>).
+
+And recall:
+
+(define (make-procedure parameters body env)
+  (list 'procedure parameters body env))
+
+Compound procedures are stored in a list: (procedure parameters body env).
+
+The only operation with the evaluator that "unwraps" these data structures is when they are passed as the "procedure" argument to (apply procedure arguments).
+
+When map is defined as a compound procedure (see above), and is called passing some procedure as its "proc" argument:
+- the evaluator will evaluate the "proc" argument and store it in one of the internal procedure data structures
+- the evaluator will begin evaluating the map call
+- the "proc" procedure is called inside the body of map
+- the evaluator will pass the "proc" procedure data structure as the "procedure" argument to (apply procedure arguments)
+- (apply procedure arguments) will "unwrap" the procedure data structure, extracting the actual procedure info, so it can either be passed to `apply-in-underlying-scheme` or evaluated as a compound procedure
++++ This works.
+
+When map is defined as a primitive procedure, and is called passing some procedure as its "proc" argument:
+- the evaluator will evaluate the "proc" argument and store it in one of the internal procedure data structures
+- the evaluator will begin evaluating the map call
+- the evaluator will pass the "proc" data structure as one of the arguments to (apply procedure arguments)
+*** the "proc" data structure is never passed as the "procedure" argument to (apply procedure arguments), and so it is not "unwrapped"
+- the evaluator will call `apply-in-underlying-scheme` with map as the procedure and will pass the still "wrapped" "proc" data structure as one of the arguments
+*** `apply-in-underlying-scheme` fails because map is expecting an actual procedure object, not one of our evaluator data structures
