@@ -1,0 +1,152 @@
+2022.03.02 Wednesday
+e4.1.4.bonus
+
+If the following ...
+
+(#%require (rename r5rs apply-in-underlying-scheme apply))
+
+... is changed to ...
+
+(#%require (rename racket apply-in-underlying-scheme apply))
+
+... what else is needed to change so that (driver-loop) operates properly?
+
+>>
+
+I experimented with changing the "underlying-scheme" language, and also the language of the primitive procedure implementations.
+
+Here's a listing of the various parts of the read-eval-print cycle with our new interpreter and the lanuage involved for each part:
+
+(We'll call the language we're interpreting "NewScheme")
+
+; Language of user input - NewScheme
+; Language of `read` and the complete expression it returns - r5rs
+; Language of NewScheme evaluator - r5rs
+; *1* Language of NewScheme evaluator list primitives - r5rs or racket
+; *2* Language of NewScheme evaluator `apply-primitive-procedure`'s `apply` call - r5rs or racket
+; Language of NewScheme evaluator output - NewScheme
+
+I starred the things I experimented with changing as *1* and *2*.  The original question above is regarding *2*.
+
+>>
+
+Here's how I made it work:
+
+(#%require (rename r5rs r5rs-apply apply))
+; cons car cdr list null? pair? read - come from sicp, which is a slightly changed r5rs
+
+(#%require (rename racket r-apply apply)
+           (rename racket r-cons cons)
+           (rename racket r-car car)
+           (rename racket r-cdr cdr)
+           (rename racket r-list list)
+           (rename racket r-null? null?)
+           (rename racket r-pair? pair?)
+           (rename racket r-read read))
+
+*
+*
+*
+
+; (4.1.4) Save references to underlying Scheme `apply`, `list`, and `cons`, for access within `apply-primitive-procedure`
+
+;; UNCOMMENT ONE OF THE FOLLOWING SETS (Language of NewScheme evaluator `apply-primitive-procedure`'s `apply` call)
+
+; Language of NewScheme evaluator `apply-primitive-procedure`'s `apply` call - r5rs
+(define apply-in-underlying-scheme r5rs-apply)
+(define list-in-underlying-scheme list)
+(define cons-in-underlying-scheme cons)
+
+; Language of NewScheme evaluator `apply-primitive-procedure`'s `apply` call - racket
+; (define apply-in-underlying-scheme r-apply)
+; (define list-in-underlying-scheme r-list)
+; (define cons-in-underlying-scheme r-cons)
+
+*
+*
+*
+
+;; UNCOMMENT ONE OF THE FOLLOWING SETS (Language of NewScheme evaluator list primitives)
+
+; Language of NewScheme evaluator list primitives - r5rs
+(define primitive-car car)
+(define primitive-cdr cdr)
+(define primitive-cons cons)
+(define primitive-list list)
+(define primitive-null? null?)
+(define primitive-pair? pair?)
+
+; Language of NewScheme evaluator list primitives - racket
+;(define primitive-car r-car)
+;(define primitive-cdr r-cdr)
+;(define primitive-cons r-cons)
+;(define primitive-list r-list)
+;(define primitive-null? r-null?)
+;(define primitive-pair? r-pair?)
+
+(define primitive-procedures
+  (list (list 'car primitive-car)
+        (list 'cdr primitive-cdr)
+        (list 'cons primitive-cons)
+        (list 'list primitive-list)
+        (list 'null? primitive-null?)
+        (list 'pair? primitive-pair?)))
+
+*
+*
+*
+
+; Take a list in one language (source) and turn it into a list in another language (target)
+
+(define (list->list
+         source
+         source-car-op source-cdr-op source-null?-op source-pair?-op
+         target-list-op target-cons-op
+         recursive)
+    (define (list->list-iter source target recursive)
+      (cond ((source-null?-op source) target)
+            ((not (source-pair?-op source)) source)
+            (else (target-cons-op (if recursive
+                                      (list->list-iter (source-car-op source) (target-list-op) recursive)
+                                      (source-car-op source))
+                                  (list->list-iter (source-cdr-op source) target recursive)))))
+    (list->list-iter source (target-list-op) recursive))
+
+; Assume input lists are in the same language as `read`.
+; Since `read` language and "list primitives" language may be different, convert `read` lists to "list primitives" lists before running `apply`; do the opposite conversion on the output of `apply`, i.e. convert `apply` output from "list primitives" lists to `read` lists.
+; Additionally, `apply` language and "list primitives" language may be different.  Only the top level list passed to `apply` needs to match the `apply` language, so convert the "list primitives" list to a `apply` list, not recursively.
+
+(define (apply-primitive-procedure proc args)
+  (define (read-lists->primitive-lists input)
+    (list->list input
+                car cdr null? pair?
+                primitive-list primitive-cons
+                true))
+  (define (primitive-list->underlying-scheme-list input)
+    (list->list input
+                primitive-car primitive-cdr primitive-null? primitive-pair?
+                list-in-underlying-scheme cons-in-underlying-scheme
+                false))
+  (define (primitive-lists->read-lists input)
+    (list->list input
+                primitive-car primitive-cdr primitive-null? primitive-pair?
+                list cons
+                true))
+  (primitive-lists->read-lists
+   (apply-in-underlying-scheme (primitive-implementation proc) (primitive-list->underlying-scheme-list (read-lists->primitive-lists args)))))
+
+>>
+
+Test with
+
+(define (append x y)
+  (if (null? x)
+      y
+      (cons (car x)
+            (append (cdr x) y))))
+
+(append '(a b c) '(d e f))
+
+(cdr '(1 2 3))
+
+It should work no matter which one of the four combinations above is used (i.e. *1* r5rs *2* r5rs ; *1* r5rs *2* racket ; *1* racket *2* r5rs ; *1* racket *2* racket)
