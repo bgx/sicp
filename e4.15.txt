@@ -1,0 +1,21 @@
+2022.03.04 Friday
+e4.15
+
+(define (run-forever) (run-forever))
+
+(define (try p)
+  (if (halts? p p)
+      (run-forever)
+      'halted))
+
+>>
+
+(try try)
+
+  (if (halts? try try)
+      (run-forever)
+      'halted)
+
+If (halts? try try) returns true -- saying that (try try) halts -- then (try try) runs forever, and (halts? try try) is incorrect.
+
+If (halts? try try) returns false -- saying that (try try) does not halt -- then (try try) halts, and (halts? try try) is incorrect.
