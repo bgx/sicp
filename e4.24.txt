@@ -1,0 +1,47 @@
+2022.03.07 Monday
+e4.24
+
+>
+
+"If a program is executed many times, its syntax is analyzed many times."
+
+Say a program runs for some time Tr.  That time spent running is split up between time spent analyzing syntax (Ta) and time spent executing the analyzed expression (Te).
+
+So Tr = Ta + Te.
+
+The new evaluator is supposed to analyze an expression only once.
+
+Say we execute a program N times.
+
+For the old evaluator, total running time will be Tr = N*Ta + N*Te.
+
+But for the new evaluator, total running time will be Tr = Ta + N*Te.
+
+If N is large -- N >> 1 -- then Tr ~= N*Te.
+
+So we can say Te ~= (new evaluator running time)/N, and Ta ~= ((old evaluator running time) - (new evaluator running time))/N.
+
+And the fraction of time spent in analysis vs execution is Ta/Te ~= ((old evaluator running time) - (new evaluator running time)) / (new evaluator running time)
+
+>
+
+Here's some code that will run an expression many times:
+
+(define (report-time repetitions total-time)
+  (newline) (display "Total time: ") (display total-time)
+  (newline) (display "Avg time per repetition: ") (display (* 1.0 (/ total-time repetitions))) (newline))
+
+(define (eval-timed-test eval-func expression environment repetitions)
+  (define (eval-timed-test-iter expression environment repetitions total-time)
+    (cond ((= 0 repetitions) total-time)
+          (else (let ((start-time (runtime)))
+                  (eval-func expression environment)
+                  (let ((end-time (runtime)))
+                    (eval-timed-test-iter expression environment (- repetitions 1) (+ total-time (- end-time start-time))))))))
+  (define (sanity-check-output expression environment)
+    (let ((output (eval-func expression environment)))
+      (newline) (display "Sanity check output: ") (user-print output) (newline)))
+  (report-time repetitions (eval-timed-test-iter expression environment repetitions 0))
+  (sanity-check-output expression environment))
+
+It can be used on small simple expressions to learn about Ta and Te for those small simple expressions, and then you can extrapolate from that data to estimate Ta and Te for larger expressions.
