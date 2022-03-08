@@ -1,0 +1,17 @@
+2022.03.08 Tuesday
+e4.35
+
+>>
+
+At first I wrote:
+
+(define (an-integer-between low high)
+  (let ((choice (amb low (an-integer-starting-from (+ low 1)))))
+    (require (<= choice high))
+    choice))
+
+But looking at the "an-element-of" definition on page 414, there's another way.  I'm not (yet) sure of what the cost of all the "let"s would be, but this gets rid of them:
+
+(define (an-integer-between low high)
+  (require (<= low high))
+  (amb low (an-integer-between (+ low 1) high)))
