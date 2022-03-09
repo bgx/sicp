@@ -1,0 +1,20 @@
+2022.03.09 Wednesday
+e4.06
+
+>>
+
+(define (let? exp) (tagged-list? exp 'let))
+(define (let-var-bindings exp) (cadr exp))
+(define (let-var-names bindings) (map (lambda (var-binding) (car var-binding)) bindings))
+(define (let-var-exps bindings) (map (lambda (var-binding) (cadr var-binding)) bindings))
+(define (let-body exp) (cddr exp))
+
+(define (let->combination exp)
+  (let ((var-bindings (let-var-bindings exp)))
+    (cons (make-lambda (let-var-names var-bindings) (let-body exp))
+          (let-var-exps var-bindings))))
+
+
+Place the following into `eval` after `(variable? exp)` and before `(application? exp)` :
+
+((let? exp) (eval (let->combination exp) env))
